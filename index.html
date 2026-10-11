@@ -2,9 +2,11 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101827">
+
   <title>AIZORA Universal App Builder</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -17,187 +19,638 @@
       color: #f8fafc;
     }
 
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
     header {
-      padding: 24px 18px;
-      background: linear-gradient(135deg, #182b49, #263b70);
-      border-bottom: 1px solid #34445e;
+      padding: 22px 16px;
+      background: linear-gradient(135deg, #172b49, #304b85);
+      border-bottom: 1px solid #3b4c69;
+    }
+
+    .brand {
+      font-size: 12px;
+      color: #a5c8ff;
+      letter-spacing: 2px;
     }
 
     header h1 {
-      margin: 0;
+      margin: 10px 0;
       font-size: 25px;
     }
 
     header p {
-      color: #cbd5e1;
+      color: #d0dbea;
       font-size: 14px;
       line-height: 1.6;
-    }
-
-    .badge {
-      display: inline-block;
-      background: #174e43;
-      color: #a7f3d0;
-      padding: 6px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      margin-bottom: 12px;
     }
 
     main {
-      max-width: 850px;
+      width: 100%;
+      max-width: 900px;
+      padding: 20px 15px 40px;
       margin: auto;
-      padding: 20px 16px 40px;
     }
 
-    .welcome {
-      padding: 22px;
-      border-radius: 18px;
+    .panel {
       background: #1b2638;
-      border: 1px solid #334155;
-      margin-bottom: 22px;
+      border: 1px solid #34445e;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 20px;
     }
 
-    .welcome h2 {
-      margin-top: 0;
-      font-size: 21px;
+    h2 {
+      font-size: 20px;
+      margin: 0 0 12px;
     }
 
-    .welcome p {
-      color: #bdc8d8;
-      line-height: 1.7;
-      font-size: 14px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 13px;
-    }
-
-    .card {
-      background: #1b2638;
-      border: 1px solid #334155;
-      border-radius: 15px;
-      padding: 17px 13px;
-      min-height: 140px;
-    }
-
-    .icon {
-      font-size: 27px;
-      margin-bottom: 12px;
-    }
-
-    .card h3 {
-      margin: 0 0 8px;
-      font-size: 16px;
-    }
-
-    .card p {
-      margin: 0;
-      font-size: 12px;
+    .muted {
       color: #aebbd0;
-      line-height: 1.6;
-    }
-
-    .section-title {
-      margin: 27px 0 14px;
-      font-size: 19px;
-    }
-
-    .status {
-      background: #172c2b;
-      border: 1px solid #285b50;
-      border-radius: 12px;
-      padding: 14px;
-      color: #a7f3d0;
       font-size: 13px;
       line-height: 1.7;
     }
 
-    footer {
-      text-align: center;
-      padding: 22px 12px;
-      color: #8290a5;
+    .primary {
+      background: linear-gradient(135deg, #3979ef, #6255e8);
+      color: white;
+      border: 0;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .secondary {
+      background: #29374d;
+      color: #f8fafc;
+      border: 1px solid #465671;
+      padding: 10px 13px;
+      border-radius: 9px;
+    }
+
+    .danger {
+      background: #542b36;
+      color: #fecdd3;
+      border: 1px solid #82404d;
+      padding: 9px 12px;
+      border-radius: 9px;
+    }
+
+    .primary:active,
+    .secondary:active,
+    .danger:active {
+      transform: scale(.98);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    input, select {
+      width: 100%;
+      background: #111b2b;
+      color: white;
+      border: 1px solid #42516a;
+      border-radius: 10px;
+      padding: 12px;
+      outline: none;
+      margin: 6px 0 14px;
+    }
+
+    input:focus, select:focus {
+      border-color: #6095ff;
+    }
+
+    label {
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .stat {
+      padding: 15px;
+      background: #1b2638;
+      border: 1px solid #34445e;
+      border-radius: 13px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
+
+    .stat span {
+      font-size: 12px;
+      color: #aebbd0;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .project-card {
+      min-width: 0;
+      padding: 15px;
+      border-radius: 13px;
+      background: #1b2638;
+      border: 1px solid #34445e;
+    }
+
+    .project-icon {
+      font-size: 29px;
+      margin-bottom: 10px;
+    }
+
+    .project-card h3 {
+      font-size: 16px;
+      overflow-wrap: anywhere;
+      margin: 0 0 8px;
+    }
+
+    .project-card p {
+      color: #aebbd0;
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .project-card .toolbar button {
+      flex: 1;
+      min-width: 0;
+      padding: 9px 6px;
       font-size: 12px;
     }
 
-    @media (max-width: 380px) {
-      .grid {
+    .empty {
+      padding: 25px 12px;
+      text-align: center;
+      color: #aebbd0;
+      border: 1px dashed #42516a;
+      border-radius: 12px;
+      line-height: 1.8;
+    }
+
+    .notice {
+      color: #b8f3d8;
+      background: #17342e;
+      border: 1px solid #2c6655;
+      padding: 13px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.7;
+      margin-top: 16px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #8391a6;
+      font-size: 12px;
+    }
+
+    @media (max-width: 420px) {
+      .project-grid {
         grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 22px;
       }
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <span class="badge">✦ APP DEVELOPMENT WORKSPACE</span>
-    <h1>🚀 AIZORA Builder</h1>
-    <p>একটি জায়গা থেকে আপনার Android অ্যাপ তৈরি ও পরিচালনার পরিকল্পনা।</p>
-  </header>
 
-  <main>
-    <section class="welcome">
-      <h2>স্বাগতম AIZORA-তে!</h2>
-      <p>
-        আপনার নিজের অ্যাপ তৈরির যাত্রা এখান থেকে শুরু।
-        AI সহায়তা, নিজে কোড সম্পাদনা এবং APK Build—
-        ধাপে ধাপে এই সিস্টেমে যুক্ত করা হবে।
-      </p>
-    </section>
+<header>
+  <div class="brand">APP DEVELOPMENT WORKSPACE</div>
+  <h1>🚀 AIZORA Builder</h1>
+  <p>
+    আপনার সব অ্যাপের প্রজেক্ট একটি জায়গায় তৈরি করুন,
+    সাজিয়ে রাখুন এবং পরিচালনা করুন।
+  </p>
+</header>
 
-    <h2 class="section-title">আপনার Workspace</h2>
+<main>
 
-    <section class="grid">
-      <article class="card">
-        <div class="icon">🤖</div>
-        <h3>AI Mode</h3>
-        <p>AI-এর সাহায্যে কোড তৈরি, পরিবর্তন ও সমস্যা সমাধানের সুবিধা যুক্ত করা হবে।</p>
-      </article>
-
-      <article class="card">
-        <div class="icon">⌨️</div>
-        <h3>Manual Mode</h3>
-        <p>AI ব্যবহার না করেও নিজে কোড সম্পাদনা করার ব্যবস্থা।</p>
-      </article>
-
-      <article class="card">
-        <div class="icon">📱</div>
-        <h3>My Projects</h3>
-        <p>প্রতিটি অ্যাপের প্রজেক্ট আলাদাভাবে সাজিয়ে রাখুন।</p>
-      </article>
-
-      <article class="card">
-        <div class="icon">⚙️</div>
-        <h3>Build APK</h3>
-        <p>GitHub Actions-এর মাধ্যমে Android APK তৈরির সুবিধা যুক্ত করা হবে।</p>
-      </article>
-
-      <article class="card">
-        <div class="icon">📜</div>
-        <h3>Build History</h3>
-        <p>আগের Build-এর ফলাফল ও ত্রুটি দেখার ব্যবস্থা।</p>
-      </article>
-
-      <article class="card">
-        <div class="icon">🛡️</div>
-        <h3>Project Safety</h3>
-        <p>প্রতিটি প্রজেক্ট আলাদা রাখা এবং মূল প্রজেক্ট সুরক্ষিত রাখার লক্ষ্য।</p>
-      </article>
-    </section>
-
-    <h2 class="section-title">বর্তমান অবস্থা</h2>
-
-    <div class="status">
-      ✓ প্রথম ইন্টারফেসের কাজ চলছে।<br>
-      ◷ AI ও Code Editor এখনো যুক্ত করা হয়নি।<br>
-      ◷ APK Build ব্যবস্থা পরবর্তী ধাপে তৈরি করা হবে।
+  <section class="stats">
+    <div class="stat">
+      <strong id="totalProjects">0</strong>
+      <span>📁 মোট প্রজেক্ট</span>
     </div>
-  </main>
 
-  <footer>
-    AIZORA Universal App Builder · Development Preview
-  </footer>
+    <div class="stat">
+      <strong id="savedProjects">0</strong>
+      <span>💾 সংরক্ষিত প্রজেক্ট</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>➕ নতুন প্রজেক্ট</h2>
+
+    <p class="muted">
+      নতুন Android অ্যাপ বা অন্য সফটওয়্যার প্রজেক্টের নাম দিন।
+    </p>
+
+    <form id="projectForm">
+      <label for="projectName">প্রজেক্টের নাম</label>
+      <input
+        id="projectName"
+        type="text"
+        maxlength="80"
+        placeholder="যেমন: AIZORA AI Assistant"
+        required
+      >
+
+      <label for="projectType">প্রজেক্টের ধরন</label>
+      <select id="projectType">
+        <option value="Android App">Android App</option>
+        <option value="Web App">Web App</option>
+        <option value="Website">Website</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="projectDescription">বিবরণ (ঐচ্ছিক)</label>
+      <input
+        id="projectDescription"
+        type="text"
+        maxlength="250"
+        placeholder="এই প্রজেক্টটি কী কাজ করবে?"
+      >
+
+      <button class="primary" type="submit">
+        + Create Project
+      </button>
+    </form>
+
+    <div id="formMessage" class="muted" role="status"></div>
+  </section>
+
+  <section class="panel">
+    <h2>📁 My Projects</h2>
+
+    <p class="muted">
+      আপনার তৈরি করা প্রজেক্টগুলো এখানে দেখা যাবে।
+    </p>
+
+    <input
+      id="searchInput"
+      type="search"
+      placeholder="🔍 প্রজেক্ট খুঁজুন..."
+      aria-label="প্রজেক্ট খুঁজুন"
+    >
+
+    <div id="projectList" class="project-grid"></div>
+
+    <div id="emptyMessage" class="empty">
+      এখনো কোনো প্রজেক্ট তৈরি করা হয়নি।<br>
+      উপরের ফর্ম থেকে আপনার প্রথম প্রজেক্ট তৈরি করুন।
+    </div>
+
+    <div class="notice">
+      💾 প্রজেক্টের তথ্য এই ব্রাউজারের Local Storage-এ সংরক্ষিত হবে।
+      ব্রাউজারের ডেটা মুছে ফেললে তথ্য হারাতে পারে।
+      এটি এখনো অনলাইন ক্লাউড ব্যাকআপ নয়।
+    </div>
+  </section>
+
+  <section id="projectDetails" class="panel hidden">
+    <h2>📂 Project Details</h2>
+
+    <div id="detailsContent"></div>
+
+    <div class="toolbar">
+      <button id="closeDetails" class="secondary" type="button">
+        বন্ধ করুন
+      </button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>🛠️ পরবর্তী সুবিধা</h2>
+
+    <p class="muted">
+      🤖 AI Mode — পরবর্তী ধাপে যুক্ত করা হবে।<br>
+      ⌨️ Manual Code Editor — এখনো তৈরি করা হয়নি।<br>
+      📦 Build APK — GitHub Actions যুক্ত করার পর কাজ করবে।<br>
+      📜 Build History — পরবর্তী ধাপে যুক্ত করা হবে।
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  AIZORA Universal App Builder · Development Preview
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  const STORAGE_KEY = "aizora_universal_builder_projects_v1";
+
+  const form = document.getElementById("projectForm");
+  const nameInput = document.getElementById("projectName");
+  const typeInput = document.getElementById("projectType");
+  const descriptionInput =
+    document.getElementById("projectDescription");
+
+  const projectList = document.getElementById("projectList");
+  const emptyMessage = document.getElementById("emptyMessage");
+  const searchInput = document.getElementById("searchInput");
+  const formMessage = document.getElementById("formMessage");
+
+  const detailsPanel = document.getElementById("projectDetails");
+  const detailsContent = document.getElementById("detailsContent");
+
+  let projects = [];
+  let storageAvailable = true;
+
+  function loadProjects() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+
+      projects = Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      projects = [];
+      storageAvailable = false;
+    }
+  }
+
+  function saveProjects() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+      storageAvailable = true;
+      return true;
+    } catch (error) {
+      storageAvailable = false;
+      alert(
+        "প্রজেক্ট সংরক্ষণ করা যায়নি। ব্রাউজারের স্টোরেজ পরীক্ষা করুন।"
+      );
+      return false;
+    }
+  }
+
+  function makeId() {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") {
+      return window.crypto.randomUUID();
+    }
+
+    return Date.now().toString(36) +
+      Math.random().toString(36).slice(2);
+  }
+
+  function createElement(tag, className, text) {
+    const element = document.createElement(tag);
+
+    if (className) {
+      element.className = className;
+    }
+
+    if (text !== undefined) {
+      element.textContent = text;
+    }
+
+    return element;
+  }
+
+  function updateStats() {
+    document.getElementById("totalProjects").textContent =
+      String(projects.length);
+
+    document.getElementById("savedProjects").textContent =
+      String(projects.length);
+  }
+
+  function renderProjects() {
+    projectList.replaceChildren();
+
+    const query = searchInput.value.trim().toLowerCase();
+
+    const filtered = projects.filter(function (project) {
+      const searchable = [
+        project.name,
+        project.type,
+        project.description
+      ].join(" ").toLowerCase();
+
+      return searchable.includes(query);
+    });
+
+    emptyMessage.classList.toggle("hidden", filtered.length > 0);
+
+    if (projects.length === 0) {
+      emptyMessage.textContent =
+        "এখনো কোনো প্রজেক্ট তৈরি করা হয়নি। উপরের ফর্ম থেকে প্রথম প্রজেক্ট তৈরি করুন।";
+    } else if (filtered.length === 0) {
+      emptyMessage.textContent =
+        "এই নামে কোনো প্রজেক্ট পাওয়া যায়নি।";
+    }
+
+    filtered.forEach(function (project) {
+      const card = createElement("article", "project-card");
+
+      const icon = createElement("div", "project-icon", "📱");
+      const title = createElement("h3", "", project.name);
+      const type = createElement("p", "", "ধরন: " + project.type);
+
+      const description = createElement(
+        "p",
+        "",
+        project.description || "কোনো বিবরণ দেওয়া হয়নি।"
+      );
+
+      const date = createElement(
+        "p",
+        "",
+        "তৈরি: " + new Date(project.createdAt).toLocaleDateString()
+      );
+
+      const toolbar = createElement("div", "toolbar");
+
+      const openButton = createElement(
+        "button",
+        "primary",
+        "Open"
+      );
+      openButton.type = "button";
+      openButton.addEventListener("click", function () {
+        openProject(project.id);
+      });
+
+      const deleteButton = createElement(
+        "button",
+        "danger",
+        "Delete"
+      );
+      deleteButton.type = "button";
+      deleteButton.addEventListener("click", function () {
+        deleteProject(project.id);
+      });
+
+      toolbar.append(openButton, deleteButton);
+      card.append(icon, title, type, description, date, toolbar);
+      projectList.appendChild(card);
+    });
+
+    updateStats();
+  }
+
+  function openProject(id) {
+    const project = projects.find(function (item) {
+      return item.id === id;
+    });
+
+    if (!project) {
+      return;
+    }
+
+    detailsContent.replaceChildren();
+
+    detailsContent.append(
+      createElement("h3", "", project.name),
+      createElement("p", "muted", "প্রজেক্টের ধরন: " + project.type),
+      createElement(
+        "p",
+        "muted",
+        "বিবরণ: " + (project.description || "নেই")
+      ),
+      createElement(
+        "p",
+        "muted",
+        "তৈরির সময়: " + new Date(project.createdAt).toLocaleString()
+      ),
+      createElement(
+        "p",
+        "muted",
+        "প্রজেক্ট ID: " + project.id
+      ),
+      createElement(
+        "div",
+        "notice",
+        "এই সংস্করণে প্রজেক্টের তথ্য সংরক্ষণ ও দেখা যায়। " +
+        "প্রজেক্টের কোড এডিটর এবং APK Build এখনো যুক্ত করা হয়নি।"
+      )
+    );
+
+    detailsPanel.classList.remove("hidden");
+    detailsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function deleteProject(id) {
+    const project = projects.find(function (item) {
+      return item.id === id;
+    });
+
+    if (!project) {
+      return;
+    }
+
+    const confirmed = confirm(
+      '"' + project.name + '" প্রজেক্টটি মুছে ফেলবেন?'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const oldProjects = projects.slice();
+
+    projects = projects.filter(function (item) {
+      return item.id !== id;
+    });
+
+    if (!saveProjects()) {
+      projects = oldProjects;
+      return;
+    }
+
+    renderProjects();
+    formMessage.textContent = "প্রজেক্ট মুছে ফেলা হয়েছে।";
+  }
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const name = nameInput.value.trim();
+
+    if (!name) {
+      formMessage.textContent = "প্রজেক্টের নাম লিখুন।";
+      return;
+    }
+
+    const duplicate = projects.some(function (project) {
+      return project.name.toLowerCase() === name.toLowerCase();
+    });
+
+    if (duplicate) {
+      formMessage.textContent =
+        "এই নামে একটি প্রজেক্ট আগে থেকেই আছে। অন্য নাম দিন।";
+      return;
+    }
+
+    const project = {
+      id: makeId(),
+      name: name,
+      type: typeInput.value,
+      description: descriptionInput.value.trim(),
+      createdAt: new Date().toISOString()
+    };
+
+    projects.unshift(project);
+
+    if (!saveProjects()) {
+      projects.shift();
+      return;
+    }
+
+    form.reset();
+    formMessage.textContent =
+      "প্রজেক্ট তৈরি ও এই ব্রাউজারে সংরক্ষণ করা হয়েছে।";
+
+    renderProjects();
+  });
+
+  searchInput.addEventListener("input", renderProjects);
+
+  document.getElementById("closeDetails").addEventListener(
+    "click",
+    function () {
+      detailsPanel.classList.add("hidden");
+    }
+  );
+
+  loadProjects();
+  renderProjects();
+
+  if (!storageAvailable) {
+    formMessage.textContent =
+      "সতর্কতা: ব্রাউজারের সংরক্ষিত তথ্য পড়া যায়নি।";
+  }
+})();
+</script>
+
 </body>
-          </html>
+</html>
