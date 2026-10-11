@@ -382,9 +382,6 @@
       মনে রাখবেন: এগুলো ব্রাউজারের মধ্যে পরিচালিত ভার্চুয়াল ফাইল।
       GitHub রিপোজিটরিতে সরাসরি ফাইল তৈরি হয় না।
     </div>
-  </section>
-  </section>
-
   <section id="editorPanel" class="panel hidden">
     <div class="editor-top">
       <h2>✏️ File Editor</h2>
@@ -410,6 +407,11 @@
 
     <div id="editorMessage" class="muted" role="status"></div>
   </section>
+
+  </section>
+  </section>
+
+
 
   <section class="panel">
     <h2>🛠️ পরবর্তী সুবিধা</h2>
@@ -920,7 +922,6 @@
       project.name + " / " + file.path;
     $("editorMessage").textContent = "";
 
-    $("managerPanel").classList.add("hidden");
     $("editorPanel").classList.remove("hidden");
 
     $("editorPanel").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -929,7 +930,6 @@
 
   function closeEditor() {
     $("editorPanel").classList.add("hidden");
-    $("managerPanel").classList.remove("hidden");
     editingFileId = null;
     editingOriginalContent = "";
   }
