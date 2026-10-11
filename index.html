@@ -4,13 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101827">
-
   <title>AIZORA Universal App Builder</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -19,13 +16,8 @@
       color: #f8fafc;
     }
 
-    button, input, select {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
 
     header {
       padding: 22px 16px;
@@ -39,10 +31,7 @@
       letter-spacing: 2px;
     }
 
-    header h1 {
-      margin: 10px 0;
-      font-size: 25px;
-    }
+    header h1 { margin: 10px 0; font-size: 25px; }
 
     header p {
       color: #d0dbea;
@@ -52,7 +41,7 @@
 
     main {
       width: 100%;
-      max-width: 900px;
+      max-width: 1000px;
       padding: 20px 15px 40px;
       margin: auto;
     }
@@ -62,13 +51,12 @@
       border: 1px solid #34445e;
       border-radius: 16px;
       padding: 18px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      min-width: 0;
     }
 
-    h2 {
-      font-size: 20px;
-      margin: 0 0 12px;
-    }
+    h2 { font-size: 20px; margin: 0 0 12px; }
+    h3 { overflow-wrap: anywhere; }
 
     .muted {
       color: #aebbd0;
@@ -76,60 +64,57 @@
       line-height: 1.7;
     }
 
+    .primary, .secondary, .danger {
+      color: white;
+      border-radius: 9px;
+      padding: 11px 13px;
+      border: 1px solid transparent;
+    }
+
     .primary {
       background: linear-gradient(135deg, #3979ef, #6255e8);
-      color: white;
-      border: 0;
-      padding: 12px 16px;
-      border-radius: 10px;
       font-weight: bold;
     }
 
     .secondary {
       background: #29374d;
-      color: #f8fafc;
-      border: 1px solid #465671;
-      padding: 10px 13px;
-      border-radius: 9px;
+      border-color: #465671;
     }
 
     .danger {
       background: #542b36;
       color: #fecdd3;
-      border: 1px solid #82404d;
-      padding: 9px 12px;
-      border-radius: 9px;
+      border-color: #82404d;
     }
 
-    .primary:active,
-    .secondary:active,
-    .danger:active {
-      transform: scale(.98);
-    }
+    button:active { transform: scale(.98); }
 
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
-    input, select {
+    input, select, textarea {
       width: 100%;
       background: #111b2b;
       color: white;
       border: 1px solid #42516a;
       border-radius: 10px;
       padding: 12px;
-      outline: none;
       margin: 6px 0 14px;
+      outline: none;
     }
 
-    input:focus, select:focus {
+    input:focus, select:focus, textarea:focus {
       border-color: #6095ff;
     }
 
+    textarea {
+      resize: vertical;
+      min-height: 260px;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      tab-size: 2;
+    }
+
     label {
+      display: block;
       font-size: 13px;
       color: #cbd5e1;
     }
@@ -138,7 +123,7 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .stat {
@@ -154,10 +139,7 @@
       margin-bottom: 5px;
     }
 
-    .stat span {
-      font-size: 12px;
-      color: #aebbd0;
-    }
+    .stat span { font-size: 12px; color: #aebbd0; }
 
     .project-grid {
       display: grid;
@@ -165,41 +147,40 @@
       gap: 12px;
     }
 
-    .project-card {
+    .project-card, .file-card {
       min-width: 0;
       padding: 15px;
       border-radius: 13px;
-      background: #1b2638;
+      background: #151f30;
       border: 1px solid #34445e;
     }
 
-    .project-icon {
-      font-size: 29px;
-      margin-bottom: 10px;
-    }
+    .project-icon { font-size: 28px; margin-bottom: 10px; }
 
-    .project-card h3 {
+    .project-card h3, .file-card h3 {
       font-size: 16px;
       overflow-wrap: anywhere;
       margin: 0 0 8px;
     }
 
-    .project-card p {
+    .project-card p, .file-card p {
       color: #aebbd0;
       font-size: 12px;
       line-height: 1.6;
       overflow-wrap: anywhere;
     }
 
-    .project-card .toolbar button {
-      flex: 1;
-      min-width: 0;
-      padding: 9px 6px;
-      font-size: 12px;
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
     }
 
+    .toolbar button { flex: 1; min-width: 90px; }
+
     .empty {
-      padding: 25px 12px;
+      padding: 24px 12px;
       text-align: center;
       color: #aebbd0;
       border: 1px dashed #42516a;
@@ -215,12 +196,76 @@
       border-radius: 10px;
       font-size: 12px;
       line-height: 1.7;
-      margin-top: 16px;
+      margin-top: 15px;
     }
 
-    .hidden {
-      display: none !important;
+    .warning {
+      color: #fde68a;
+      background: #3b3018;
+      border: 1px solid #75602b;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.7;
+      margin-top: 12px;
     }
+
+    .hidden { display: none !important; }
+
+    .breadcrumbs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      margin: 14px 0;
+      color: #a5c8ff;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .breadcrumbs button {
+      color: #a5c8ff;
+      background: transparent;
+      border: 0;
+      padding: 4px;
+      text-decoration: underline;
+    }
+
+    .file-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .file-card .file-icon {
+      font-size: 25px;
+      margin-bottom: 8px;
+    }
+
+    .file-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .file-actions button {
+      flex: 1;
+      min-width: 75px;
+      padding: 8px;
+      font-size: 12px;
+    }
+
+    .editor-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .editor-top h3 { margin: 0; }
 
     footer {
       text-align: center;
@@ -229,135 +274,153 @@
       font-size: 12px;
     }
 
-    @media (max-width: 420px) {
-      .project-grid {
-        grid-template-columns: 1fr;
-      }
-
-      header h1 {
-        font-size: 22px;
-      }
+    @media (max-width: 520px) {
+      .project-grid, .file-list { grid-template-columns: 1fr; }
+      header h1 { font-size: 22px; }
+      .panel { padding: 14px; }
+      .toolbar button { min-width: 80px; }
     }
   </style>
 </head>
 
 <body>
-
 <header>
   <div class="brand">APP DEVELOPMENT WORKSPACE</div>
   <h1>🚀 AIZORA Builder</h1>
   <p>
-    আপনার সব অ্যাপের প্রজেক্ট একটি জায়গায় তৈরি করুন,
-    সাজিয়ে রাখুন এবং পরিচালনা করুন।
+    আপনার সব প্রজেক্ট তৈরি করুন, প্রতিটির ফাইল আলাদাভাবে পরিচালনা করুন
+    এবং ধাপে ধাপে অ্যাপ তৈরি করুন।
   </p>
 </header>
 
 <main>
-
   <section class="stats">
     <div class="stat">
       <strong id="totalProjects">0</strong>
       <span>📁 মোট প্রজেক্ট</span>
     </div>
-
     <div class="stat">
-      <strong id="savedProjects">0</strong>
-      <span>💾 সংরক্ষিত প্রজেক্ট</span>
+      <strong id="totalFiles">0</strong>
+      <span>📄 মোট ফাইল</span>
     </div>
   </section>
 
-  <section class="panel">
+  <section id="homePanel" class="panel">
     <h2>➕ নতুন প্রজেক্ট</h2>
-
-    <p class="muted">
-      নতুন Android অ্যাপ বা অন্য সফটওয়্যার প্রজেক্টের নাম দিন।
-    </p>
+    <p class="muted">প্রতিটি প্রজেক্টের নিজস্ব ফাইল ও ফোল্ডার থাকবে।</p>
 
     <form id="projectForm">
       <label for="projectName">প্রজেক্টের নাম</label>
-      <input
-        id="projectName"
-        type="text"
-        maxlength="80"
-        placeholder="যেমন: AIZORA AI Assistant"
-        required
-      >
+      <input id="projectName" maxlength="80"
+        placeholder="যেমন: AIZORA AI Assistant" required>
 
       <label for="projectType">প্রজেক্টের ধরন</label>
       <select id="projectType">
-        <option value="Android App">Android App</option>
-        <option value="Web App">Web App</option>
-        <option value="Website">Website</option>
-        <option value="Other">Other</option>
+        <option>Android App</option>
+        <option>Web App</option>
+        <option>Website</option>
+        <option>Other</option>
       </select>
 
       <label for="projectDescription">বিবরণ (ঐচ্ছিক)</label>
-      <input
-        id="projectDescription"
-        type="text"
-        maxlength="250"
-        placeholder="এই প্রজেক্টটি কী কাজ করবে?"
-      >
+      <input id="projectDescription" maxlength="250"
+        placeholder="প্রজেক্টটি কী কাজ করবে?">
 
-      <button class="primary" type="submit">
-        + Create Project
-      </button>
+      <button class="primary" type="submit">＋ Create Project</button>
     </form>
-
     <div id="formMessage" class="muted" role="status"></div>
   </section>
 
-  <section class="panel">
+  <section id="projectsPanel" class="panel">
     <h2>📁 My Projects</h2>
+    <p class="muted">একটি প্রজেক্ট খুলে তার ফাইল ও ফোল্ডার পরিচালনা করুন।</p>
 
-    <p class="muted">
-      আপনার তৈরি করা প্রজেক্টগুলো এখানে দেখা যাবে।
-    </p>
-
-    <input
-      id="searchInput"
-      type="search"
-      placeholder="🔍 প্রজেক্ট খুঁজুন..."
-      aria-label="প্রজেক্ট খুঁজুন"
-    >
+    <input id="searchInput" type="search"
+      placeholder="🔍 প্রজেক্ট খুঁজুন..." aria-label="প্রজেক্ট খুঁজুন">
 
     <div id="projectList" class="project-grid"></div>
-
-    <div id="emptyMessage" class="empty">
-      এখনো কোনো প্রজেক্ট তৈরি করা হয়নি।<br>
-      উপরের ফর্ম থেকে আপনার প্রথম প্রজেক্ট তৈরি করুন।
-    </div>
-
-    <div class="notice">
-      💾 প্রজেক্টের তথ্য এই ব্রাউজারের Local Storage-এ সংরক্ষিত হবে।
-      ব্রাউজারের ডেটা মুছে ফেললে তথ্য হারাতে পারে।
-      এটি এখনো অনলাইন ক্লাউড ব্যাকআপ নয়।
+    <div id="emptyProjects" class="empty">
+      এখনো কোনো প্রজেক্ট নেই। উপরের ফর্ম থেকে প্রথম প্রজেক্ট তৈরি করুন।
     </div>
   </section>
 
-  <section id="projectDetails" class="panel hidden">
-    <h2>📂 Project Details</h2>
+  <section id="managerPanel" class="panel hidden">
+    <div class="editor-top">
+      <h2>📂 Project File Manager</h2>
+      <button id="backHome" class="secondary" type="button">
+        ← My Projects
+      </button>
+    </div>
 
-    <div id="detailsContent"></div>
+    <h3 id="managerProjectName"></h3>
+    <p id="managerProjectInfo" class="muted"></p>
+
+    <div class="notice">
+      এই প্রজেক্টের ফাইলগুলো অন্য প্রজেক্ট থেকে আলাদাভাবে সংরক্ষণ করা হয়।
+    </div>
+
+    <div id="breadcrumbs" class="breadcrumbs"></div>
 
     <div class="toolbar">
-      <button id="closeDetails" class="secondary" type="button">
+      <button id="newFileButton" class="primary" type="button">
+        ＋ New File
+      </button>
+      <button id="newFolderButton" class="secondary" type="button">
+        📁 New Folder
+      </button>
+      <button id="refreshFiles" class="secondary" type="button">
+        ↻ Refresh
+      </button>
+    </div>
+
+    <div id="fileMessage" class="muted" role="status"></div>
+    <div id="fileList" class="file-list"></div>
+    <div id="emptyFiles" class="empty hidden">
+      এই ফোল্ডারটি খালি। নতুন ফাইল অথবা ফোল্ডার তৈরি করুন।
+    </div>
+
+    <div class="warning">
+      মনে রাখবেন: এগুলো ব্রাউজারের মধ্যে পরিচালিত ভার্চুয়াল ফাইল।
+      GitHub রিপোজিটরিতে সরাসরি ফাইল তৈরি হয় না।
+    </div>
+  </section>
+
+  <section id="editorPanel" class="panel hidden">
+    <div class="editor-top">
+      <h2>✏️ File Editor</h2>
+      <button id="closeEditor" class="secondary" type="button">
         বন্ধ করুন
       </button>
     </div>
+
+    <p id="editorFilePath" class="muted"></p>
+
+    <label for="fileContent">ফাইলের বিষয়বস্তু</label>
+    <textarea id="fileContent" spellcheck="false"
+      autocapitalize="off" autocomplete="off"></textarea>
+
+    <div class="toolbar">
+      <button id="saveFile" class="primary" type="button">
+        💾 Save File
+      </button>
+      <button id="cancelEdit" class="secondary" type="button">
+        বাতিল
+      </button>
+    </div>
+
+    <div id="editorMessage" class="muted" role="status"></div>
   </section>
 
   <section class="panel">
     <h2>🛠️ পরবর্তী সুবিধা</h2>
-
     <p class="muted">
-      🤖 AI Mode — পরবর্তী ধাপে যুক্ত করা হবে।<br>
-      ⌨️ Manual Code Editor — এখনো তৈরি করা হয়নি।<br>
-      📦 Build APK — GitHub Actions যুক্ত করার পর কাজ করবে।<br>
-      📜 Build History — পরবর্তী ধাপে যুক্ত করা হবে।
+      🤖 AI Mode — এখনো যুক্ত করা হয়নি।<br>
+      ⌨️ Manual Editor — বর্তমানে সাধারণ টেক্সট/কোড এডিটর আছে।<br>
+      📦 Build APK — এখনো সংযুক্ত নয়।<br>
+      📜 Build History — পরে যুক্ত করা হবে।<br>
+      ☁️ Cloud Sync — এখনো যুক্ত করা হয়নি।
     </p>
   </section>
-
 </main>
 
 <footer>
@@ -370,22 +433,32 @@
 
   const STORAGE_KEY = "aizora_universal_builder_projects_v1";
 
-  const form = document.getElementById("projectForm");
-  const nameInput = document.getElementById("projectName");
-  const typeInput = document.getElementById("projectType");
-  const descriptionInput =
-    document.getElementById("projectDescription");
-
-  const projectList = document.getElementById("projectList");
-  const emptyMessage = document.getElementById("emptyMessage");
-  const searchInput = document.getElementById("searchInput");
-  const formMessage = document.getElementById("formMessage");
-
-  const detailsPanel = document.getElementById("projectDetails");
-  const detailsContent = document.getElementById("detailsContent");
+  const $ = id => document.getElementById(id);
 
   let projects = [];
-  let storageAvailable = true;
+  let currentProjectId = null;
+  let currentFolder = "";
+  let editingFileId = null;
+  let editingOriginalContent = "";
+
+  const form = $("projectForm");
+  const nameInput = $("projectName");
+  const typeInput = $("projectType");
+  const descriptionInput = $("projectDescription");
+
+  function makeId() {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") {
+      return window.crypto.randomUUID();
+    }
+    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+  }
+
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
 
   function loadProjects() {
     try {
@@ -393,230 +466,144 @@
       const parsed = raw ? JSON.parse(raw) : [];
 
       projects = Array.isArray(parsed) ? parsed : [];
+
+      projects = projects.filter(p =>
+        p && typeof p.id === "string" &&
+        typeof p.name === "string"
+      );
+
+      // পুরোনো সংস্করণের প্রজেক্টে ফাইলের তালিকা যোগ করা।
+      projects.forEach(project => {
+        if (!Array.isArray(project.files)) project.files = [];
+        if (!Array.isArray(project.folders)) project.folders = [];
+      });
     } catch (error) {
       projects = [];
-      storageAvailable = false;
+      $("formMessage").textContent =
+        "সংরক্ষিত তথ্য পড়া যায়নি। ব্রাউজারের স্টোরেজ পরীক্ষা করুন।";
     }
   }
 
   function saveProjects() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
-      storageAvailable = true;
       return true;
     } catch (error) {
-      storageAvailable = false;
       alert(
-        "প্রজেক্ট সংরক্ষণ করা যায়নি। ব্রাউজারের স্টোরেজ পরীক্ষা করুন।"
+        "সংরক্ষণ করা যায়নি। ব্রাউজারের স্টোরেজ পূর্ণ হতে পারে। " +
+        "গুরুত্বপূর্ণ লেখা কপি করে রাখুন।"
       );
       return false;
     }
   }
 
-  function makeId() {
-    if (window.crypto && typeof window.crypto.randomUUID === "function") {
-      return window.crypto.randomUUID();
-    }
-
-    return Date.now().toString(36) +
-      Math.random().toString(36).slice(2);
+  function currentProject() {
+    return projects.find(p => p.id === currentProjectId) || null;
   }
 
-  function createElement(tag, className, text) {
-    const element = document.createElement(tag);
-
-    if (className) {
-      element.className = className;
-    }
-
-    if (text !== undefined) {
-      element.textContent = text;
-    }
-
-    return element;
+  function totalFileCount() {
+    return projects.reduce((sum, p) =>
+      sum + (Array.isArray(p.files) ? p.files.length : 0), 0);
   }
 
   function updateStats() {
-    document.getElementById("totalProjects").textContent =
-      String(projects.length);
-
-    document.getElementById("savedProjects").textContent =
-      String(projects.length);
+    $("totalProjects").textContent = String(projects.length);
+    $("totalFiles").textContent = String(totalFileCount());
   }
 
   function renderProjects() {
-    projectList.replaceChildren();
+    const list = $("projectList");
+    list.replaceChildren();
 
-    const query = searchInput.value.trim().toLowerCase();
+    const query = $("searchInput").value.trim().toLowerCase();
 
-    const filtered = projects.filter(function (project) {
-      const searchable = [
-        project.name,
-        project.type,
-        project.description
-      ].join(" ").toLowerCase();
+    const filtered = projects.filter(project =>
+      [project.name, project.type, project.description || ""]
+        .join(" ").toLowerCase().includes(query)
+    );
 
-      return searchable.includes(query);
-    });
+    $("emptyProjects").classList.toggle("hidden", filtered.length > 0);
 
-    emptyMessage.classList.toggle("hidden", filtered.length > 0);
-
-    if (projects.length === 0) {
-      emptyMessage.textContent =
-        "এখনো কোনো প্রজেক্ট তৈরি করা হয়নি। উপরের ফর্ম থেকে প্রথম প্রজেক্ট তৈরি করুন।";
-    } else if (filtered.length === 0) {
-      emptyMessage.textContent =
-        "এই নামে কোনো প্রজেক্ট পাওয়া যায়নি।";
+    if (projects.length && !filtered.length) {
+      $("emptyProjects").textContent = "কোনো প্রজেক্ট পাওয়া যায়নি।";
+    } else {
+      $("emptyProjects").textContent =
+        "এখনো কোনো প্রজেক্ট নেই। উপরের ফর্ম থেকে প্রথম প্রজেক্ট তৈরি করুন।";
     }
 
-    filtered.forEach(function (project) {
-      const card = createElement("article", "project-card");
-
-      const icon = createElement("div", "project-icon", "📱");
-      const title = createElement("h3", "", project.name);
-      const type = createElement("p", "", "ধরন: " + project.type);
-
-      const description = createElement(
-        "p",
-        "",
-        project.description || "কোনো বিবরণ দেওয়া হয়নি।"
+    filtered.forEach(project => {
+      const card = element("article", "project-card");
+      card.append(
+        element("div", "project-icon", "📁"),
+        element("h3", "", project.name),
+        element("p", "", "ধরন: " + project.type),
+        element("p", "", project.description || "কোনো বিবরণ নেই।"),
+        element("p", "", "ফাইল: " + project.files.length)
       );
 
-      const date = createElement(
-        "p",
-        "",
-        "তৈরি: " + new Date(project.createdAt).toLocaleDateString()
-      );
+      const toolbar = element("div", "toolbar");
 
-      const toolbar = createElement("div", "toolbar");
+      const open = element("button", "primary", "Open Project");
+      open.type = "button";
+      open.addEventListener("click", () => openProject(project.id));
 
-      const openButton = createElement(
-        "button",
-        "primary",
-        "Open"
-      );
-      openButton.type = "button";
-      openButton.addEventListener("click", function () {
-        openProject(project.id);
-      });
+      const remove = element("button", "danger", "Delete");
+      remove.type = "button";
+      remove.addEventListener("click", () => deleteProject(project.id));
 
-      const deleteButton = createElement(
-        "button",
-        "danger",
-        "Delete"
-      );
-      deleteButton.type = "button";
-      deleteButton.addEventListener("click", function () {
-        deleteProject(project.id);
-      });
-
-      toolbar.append(openButton, deleteButton);
-      card.append(icon, title, type, description, date, toolbar);
-      projectList.appendChild(card);
+      toolbar.append(open, remove);
+      card.append(toolbar);
+      list.append(card);
     });
 
     updateStats();
   }
 
-  function openProject(id) {
-    const project = projects.find(function (item) {
-      return item.id === id;
-    });
-
-    if (!project) {
-      return;
-    }
-
-    detailsContent.replaceChildren();
-
-    detailsContent.append(
-      createElement("h3", "", project.name),
-      createElement("p", "muted", "প্রজেক্টের ধরন: " + project.type),
-      createElement(
-        "p",
-        "muted",
-        "বিবরণ: " + (project.description || "নেই")
-      ),
-      createElement(
-        "p",
-        "muted",
-        "তৈরির সময়: " + new Date(project.createdAt).toLocaleString()
-      ),
-      createElement(
-        "p",
-        "muted",
-        "প্রজেক্ট ID: " + project.id
-      ),
-      createElement(
-        "div",
-        "notice",
-        "এই সংস্করণে প্রজেক্টের তথ্য সংরক্ষণ ও দেখা যায়। " +
-        "প্রজেক্টের কোড এডিটর এবং APK Build এখনো যুক্ত করা হয়নি।"
-      )
-    );
-
-    detailsPanel.classList.remove("hidden");
-    detailsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
   function deleteProject(id) {
-    const project = projects.find(function (item) {
-      return item.id === id;
-    });
+    const project = projects.find(p => p.id === id);
+    if (!project) return;
 
-    if (!project) {
-      return;
-    }
+    if (!confirm(
+      '"' + project.name + '" এবং এর সব ফাইল মুছে ফেলবেন?'
+    )) return;
 
-    const confirmed = confirm(
-      '"' + project.name + '" প্রজেক্টটি মুছে ফেলবেন?'
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    const oldProjects = projects.slice();
-
-    projects = projects.filter(function (item) {
-      return item.id !== id;
-    });
+    const previous = projects;
+    projects = projects.filter(p => p.id !== id);
 
     if (!saveProjects()) {
-      projects = oldProjects;
+      projects = previous;
       return;
     }
 
+    if (currentProjectId === id) backHome();
     renderProjects();
-    formMessage.textContent = "প্রজেক্ট মুছে ফেলা হয়েছে।";
+    $("formMessage").textContent = "প্রজেক্ট মুছে ফেলা হয়েছে।";
   }
 
-  form.addEventListener("submit", function (event) {
+  form.addEventListener("submit", event => {
     event.preventDefault();
 
     const name = nameInput.value.trim();
 
     if (!name) {
-      formMessage.textContent = "প্রজেক্টের নাম লিখুন।";
+      $("formMessage").textContent = "প্রজেক্টের নাম লিখুন।";
       return;
     }
 
-    const duplicate = projects.some(function (project) {
-      return project.name.toLowerCase() === name.toLowerCase();
-    });
-
-    if (duplicate) {
-      formMessage.textContent =
-        "এই নামে একটি প্রজেক্ট আগে থেকেই আছে। অন্য নাম দিন।";
+    if (projects.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+      $("formMessage").textContent =
+        "এই নামে একটি প্রজেক্ট আছে। অন্য নাম দিন।";
       return;
     }
 
     const project = {
       id: makeId(),
-      name: name,
+      name,
       type: typeInput.value,
       description: descriptionInput.value.trim(),
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      files: [],
+      folders: []
     };
 
     projects.unshift(project);
@@ -627,30 +614,377 @@
     }
 
     form.reset();
-    formMessage.textContent =
-      "প্রজেক্ট তৈরি ও এই ব্রাউজারে সংরক্ষণ করা হয়েছে।";
-
+    $("formMessage").textContent = "প্রজেক্ট তৈরি ও সংরক্ষণ করা হয়েছে।";
     renderProjects();
   });
 
-  searchInput.addEventListener("input", renderProjects);
+  $("searchInput").addEventListener("input", renderProjects);
 
-  document.getElementById("closeDetails").addEventListener(
-    "click",
-    function () {
-      detailsPanel.classList.add("hidden");
+  function openProject(id) {
+    const project = projects.find(p => p.id === id);
+    if (!project) return;
+
+    currentProjectId = id;
+    currentFolder = "";
+
+    $("homePanel").classList.add("hidden");
+    $("projectsPanel").classList.add("hidden");
+    $("managerPanel").classList.remove("hidden");
+    $("editorPanel").classList.add("hidden");
+
+    $("managerProjectName").textContent = "📂 " + project.name;
+    $("managerProjectInfo").textContent =
+      project.type + " · তৈরি: " +
+      new Date(project.createdAt).toLocaleDateString();
+
+    renderFiles();
+    $("managerPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function backHome() {
+    currentProjectId = null;
+    currentFolder = "";
+    editingFileId = null;
+
+    $("managerPanel").classList.add("hidden");
+    $("editorPanel").classList.add("hidden");
+    $("homePanel").classList.remove("hidden");
+    $("projectsPanel").classList.remove("hidden");
+
+    renderProjects();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  $("backHome").addEventListener("click", backHome);
+
+  function parentFolder(path) {
+    const parts = path.split("/").filter(Boolean);
+    parts.pop();
+    return parts.join("/");
+  }
+
+  function pathName(path) {
+    return path.split("/").filter(Boolean).pop() || path;
+  }
+
+  function joinPath(folder, name) {
+    return folder ? folder + "/" + name : name;
+  }
+
+  function isValidName(name) {
+    return Boolean(name) &&
+      name.trim() === name &&
+      name !== "." &&
+      name !== ".." &&
+      !/[\/\\]/.test(name) &&
+      !/[\u0000-\u001f]/.test(name);
+  }
+
+  function folderExists(project, path) {
+    return project.folders.includes(path);
+  }
+
+  function renderBreadcrumbs() {
+    const container = $("breadcrumbs");
+    container.replaceChildren();
+
+    const root = element("button", "", "📁 " + currentProject().name);
+    root.type = "button";
+    root.addEventListener("click", () => {
+      currentFolder = "";
+      renderFiles();
+    });
+    container.append(root);
+
+    let built = "";
+    currentFolder.split("/").filter(Boolean).forEach(part => {
+      built = joinPath(built, part);
+      const path = built;
+      container.append(element("span", "", "›"));
+
+      const button = element("button", "", part);
+      button.type = "button";
+      button.addEventListener("click", () => {
+        currentFolder = path;
+        renderFiles();
+      });
+      container.append(button);
+    });
+  }
+
+  function renderFiles() {
+    const project = currentProject();
+    if (!project) return;
+
+    renderBreadcrumbs();
+
+    const list = $("fileList");
+    list.replaceChildren();
+
+    const folders = project.folders
+      .filter(path => parentFolder(path) === currentFolder)
+      .sort((a, b) => pathName(a).localeCompare(pathName(b)));
+
+    const files = project.files
+      .filter(file => parentFolder(file.path) === currentFolder)
+      .sort((a, b) => pathName(a.path).localeCompare(pathName(b.path)));
+
+    $("emptyFiles").classList.toggle(
+      "hidden",
+      folders.length + files.length > 0
+    );
+
+    folders.forEach(path => {
+      const card = element("article", "file-card");
+      card.append(
+        element("div", "file-icon", "📁"),
+        element("h3", "", pathName(path)),
+        element("p", "", "Folder")
+      );
+
+      const actions = element("div", "file-actions");
+
+      const open = element("button", "secondary", "Open");
+      open.type = "button";
+      open.addEventListener("click", () => {
+        currentFolder = path;
+        renderFiles();
+      });
+
+      const remove = element("button", "danger", "Delete");
+      remove.type = "button";
+      remove.addEventListener("click", () => deleteFolder(path));
+
+      actions.append(open, remove);
+      card.append(actions);
+      list.append(card);
+    });
+
+    files.forEach(file => {
+      const card = element("article", "file-card");
+      card.append(
+        element("div", "file-icon", "📄"),
+        element("h3", "", pathName(file.path)),
+        element("p", "", "শেষ পরিবর্তন: " +
+          new Date(file.updatedAt).toLocaleString())
+      );
+
+      const actions = element("div", "file-actions");
+
+      const edit = element("button", "primary", "Edit");
+      edit.type = "button";
+      edit.addEventListener("click", () => openEditor(file.id));
+
+      const remove = element("button", "danger", "Delete");
+      remove.type = "button";
+      remove.addEventListener("click", () => deleteFile(file.id));
+
+      actions.append(edit, remove);
+      card.append(actions);
+      list.append(card);
+    });
+
+    updateStats();
+  }
+
+  function newFile() {
+    const project = currentProject();
+    if (!project) return;
+
+    const name = prompt("নতুন ফাইলের নাম লিখুন:\nযেমন: index.html");
+    if (name === null) return;
+
+    if (!isValidName(name)) {
+      alert("একটি সঠিক ফাইলের নাম দিন। নামের মধ্যে / ব্যবহার করবেন না।");
+      return;
     }
-  );
+
+    const path = joinPath(currentFolder, name);
+
+    if (project.files.some(f => f.path === path) ||
+        project.folders.includes(path)) {
+      alert("এই নামে ফাইল বা ফোল্ডার আগে থেকেই আছে।");
+      return;
+    }
+
+    const file = {
+      id: makeId(),
+      path,
+      content: "",
+      updatedAt: new Date().toISOString()
+    };
+
+    project.files.push(file);
+
+    if (!saveProjects()) {
+      project.files.pop();
+      return;
+    }
+
+    renderFiles();
+    openEditor(file.id);
+  }
+
+  function newFolder() {
+    const project = currentProject();
+    if (!project) return;
+
+    const name = prompt("নতুন ফোল্ডারের নাম লিখুন:");
+    if (name === null) return;
+
+    if (!isValidName(name)) {
+      alert("একটি সঠিক ফোল্ডারের নাম দিন।");
+      return;
+    }
+
+    const path = joinPath(currentFolder, name);
+
+    if (project.folders.includes(path) ||
+        project.files.some(f => f.path === path)) {
+      alert("এই নামে ফাইল বা ফোল্ডার আগে থেকেই আছে।");
+      return;
+    }
+
+    project.folders.push(path);
+
+    if (!saveProjects()) {
+      project.folders.pop();
+      return;
+    }
+
+    $("fileMessage").textContent = "ফোল্ডার তৈরি ও সংরক্ষণ করা হয়েছে।";
+    renderFiles();
+  }
+
+  function deleteFile(id) {
+    const project = currentProject();
+    if (!project) return;
+
+    const index = project.files.findIndex(f => f.id === id);
+    if (index < 0) return;
+
+    const file = project.files[index];
+
+    if (!confirm('"' + pathName(file.path) + '" মুছে ফেলবেন?')) return;
+
+    project.files.splice(index, 1);
+
+    if (!saveProjects()) {
+      project.files.splice(index, 0, file);
+      return;
+    }
+
+    $("fileMessage").textContent = "ফাইল মুছে ফেলা হয়েছে।";
+    renderFiles();
+  }
+
+  function deleteFolder(path) {
+    const project = currentProject();
+    if (!project) return;
+
+    const descendants = project.folders.filter(p => p.startsWith(path + "/"));
+    const files = project.files.filter(f => f.path.startsWith(path + "/"));
+
+    if (descendants.length || files.length) {
+      alert("ফোল্ডারটি খালি নয়। আগে এর ভেতরের ফাইল ও ফোল্ডার মুছুন।");
+      return;
+    }
+
+    if (!confirm('"' + pathName(path) + '" ফোল্ডারটি মুছে ফেলবেন?')) return;
+
+    const index = project.folders.indexOf(path);
+    if (index < 0) return;
+
+    project.folders.splice(index, 1);
+
+    if (!saveProjects()) {
+      project.folders.splice(index, 0, path);
+      return;
+    }
+
+    $("fileMessage").textContent = "ফোল্ডার মুছে ফেলা হয়েছে।";
+    renderFiles();
+  }
+
+  function openEditor(id) {
+    const project = currentProject();
+    if (!project) return;
+
+    const file = project.files.find(f => f.id === id);
+    if (!file) return;
+
+    editingFileId = id;
+    editingOriginalContent = file.content;
+
+    $("fileContent").value = file.content;
+    $("editorFilePath").textContent =
+      project.name + " / " + file.path;
+    $("editorMessage").textContent = "";
+
+    $("managerPanel").classList.add("hidden");
+    $("editorPanel").classList.remove("hidden");
+
+    $("editorPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+    $("fileContent").focus();
+  }
+
+  function closeEditor() {
+    $("editorPanel").classList.add("hidden");
+    $("managerPanel").classList.remove("hidden");
+    editingFileId = null;
+    editingOriginalContent = "";
+  }
+
+  function saveCurrentFile() {
+    const project = currentProject();
+    if (!project || !editingFileId) return;
+
+    const file = project.files.find(f => f.id === editingFileId);
+    if (!file) return;
+
+    const oldContent = file.content;
+    const oldUpdatedAt = file.updatedAt;
+
+    file.content = $("fileContent").value;
+    file.updatedAt = new Date().toISOString();
+
+    if (!saveProjects()) {
+      file.content = oldContent;
+      file.updatedAt = oldUpdatedAt;
+      return;
+    }
+
+    editingOriginalContent = file.content;
+    $("editorMessage").textContent =
+      "✓ ফাইল এই ব্রাউজারে সংরক্ষণ করা হয়েছে।";
+
+    renderFiles();
+  }
+
+  $("newFileButton").addEventListener("click", newFile);
+  $("newFolderButton").addEventListener("click", newFolder);
+  $("refreshFiles").addEventListener("click", renderFiles);
+  $("saveFile").addEventListener("click", saveCurrentFile);
+
+  $("closeEditor").addEventListener("click", () => {
+    if ($("fileContent").value !== editingOriginalContent &&
+        !confirm("আপনার পরিবর্তন সংরক্ষণ করা হয়নি। বন্ধ করবেন?")) {
+      return;
+    }
+    closeEditor();
+  });
+
+  $("cancelEdit").addEventListener("click", () => {
+    if ($("fileContent").value !== editingOriginalContent &&
+        !confirm("আপনার পরিবর্তন বাতিল করবেন?")) {
+      return;
+    }
+    closeEditor();
+  });
 
   loadProjects();
   renderProjects();
-
-  if (!storageAvailable) {
-    formMessage.textContent =
-      "সতর্কতা: ব্রাউজারের সংরক্ষিত তথ্য পড়া যায়নি।";
-  }
 })();
 </script>
-
 </body>
 </html>
