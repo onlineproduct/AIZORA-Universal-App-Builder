@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101827">
+  <title>AIZORA Universal App Builder</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #101827;
+      color: #f8fafc;
+    }
+
+    header {
+      padding: 24px 18px;
+      background: linear-gradient(135deg, #182b49, #263b70);
+      border-bottom: 1px solid #34445e;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 25px;
+    }
+
+    header p {
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #174e43;
+      color: #a7f3d0;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    main {
+      max-width: 850px;
+      margin: auto;
+      padding: 20px 16px 40px;
+    }
+
+    .welcome {
+      padding: 22px;
+      border-radius: 18px;
+      background: #1b2638;
+      border: 1px solid #334155;
+      margin-bottom: 22px;
+    }
+
+    .welcome h2 {
+      margin-top: 0;
+      font-size: 21px;
+    }
+
+    .welcome p {
+      color: #bdc8d8;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .card {
+      background: #1b2638;
+      border: 1px solid #334155;
+      border-radius: 15px;
+      padding: 17px 13px;
+      min-height: 140px;
+    }
+
+    .icon {
+      font-size: 27px;
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 12px;
+      color: #aebbd0;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      margin: 27px 0 14px;
+      font-size: 19px;
+    }
+
+    .status {
+      background: #172c2b;
+      border: 1px solid #285b50;
+      border-radius: 12px;
+      padding: 14px;
+      color: #a7f3d0;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    footer {
+      text-align: center;
+      padding: 22px 12px;
+      color: #8290a5;
+      font-size: 12px;
+    }
+
+    @media (max-width: 380px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <span class="badge">✦ APP DEVELOPMENT WORKSPACE</span>
+    <h1>🚀 AIZORA Builder</h1>
+    <p>একটি জায়গা থেকে আপনার Android অ্যাপ তৈরি ও পরিচালনার পরিকল্পনা।</p>
+  </header>
+
+  <main>
+    <section class="welcome">
+      <h2>স্বাগতম AIZORA-তে!</h2>
+      <p>
+        আপনার নিজের অ্যাপ তৈরির যাত্রা এখান থেকে শুরু।
+        AI সহায়তা, নিজে কোড সম্পাদনা এবং APK Build—
+        ধাপে ধাপে এই সিস্টেমে যুক্ত করা হবে।
+      </p>
+    </section>
+
+    <h2 class="section-title">আপনার Workspace</h2>
+
+    <section class="grid">
+      <article class="card">
+        <div class="icon">🤖</div>
+        <h3>AI Mode</h3>
+        <p>AI-এর সাহায্যে কোড তৈরি, পরিবর্তন ও সমস্যা সমাধানের সুবিধা যুক্ত করা হবে।</p>
+      </article>
+
+      <article class="card">
+        <div class="icon">⌨️</div>
+        <h3>Manual Mode</h3>
+        <p>AI ব্যবহার না করেও নিজে কোড সম্পাদনা করার ব্যবস্থা।</p>
+      </article>
+
+      <article class="card">
+        <div class="icon">📱</div>
+        <h3>My Projects</h3>
+        <p>প্রতিটি অ্যাপের প্রজেক্ট আলাদাভাবে সাজিয়ে রাখুন।</p>
+      </article>
+
+      <article class="card">
+        <div class="icon">⚙️</div>
+        <h3>Build APK</h3>
+        <p>GitHub Actions-এর মাধ্যমে Android APK তৈরির সুবিধা যুক্ত করা হবে।</p>
+      </article>
+
+      <article class="card">
+        <div class="icon">📜</div>
+        <h3>Build History</h3>
+        <p>আগের Build-এর ফলাফল ও ত্রুটি দেখার ব্যবস্থা।</p>
+      </article>
+
+      <article class="card">
+        <div class="icon">🛡️</div>
+        <h3>Project Safety</h3>
+        <p>প্রতিটি প্রজেক্ট আলাদা রাখা এবং মূল প্রজেক্ট সুরক্ষিত রাখার লক্ষ্য।</p>
+      </article>
+    </section>
+
+    <h2 class="section-title">বর্তমান অবস্থা</h2>
+
+    <div class="status">
+      ✓ প্রথম ইন্টারফেসের কাজ চলছে।<br>
+      ◷ AI ও Code Editor এখনো যুক্ত করা হয়নি।<br>
+      ◷ APK Build ব্যবস্থা পরবর্তী ধাপে তৈরি করা হবে।
+    </div>
+  </main>
+
+  <footer>
+    AIZORA Universal App Builder · Development Preview
+  </footer>
+</body>
+          </html>
