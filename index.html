@@ -980,8 +980,8 @@
       u16(cv, 30, 0);
       u16(cv, 32, 0);
       u16(cv, 34, 0);
-      u16(cv, 36, entry.directory ? 0x10 : 0);
-      u32(cv, 38, 0);
+      u16(cv, 36, 0);
+      u32(cv, 38, entry.directory ? (0x10 << 16) : 0);
       u32(cv, 42, localOffset);
       central.set(nameBytes, 46);
       centralParts.push(central);
