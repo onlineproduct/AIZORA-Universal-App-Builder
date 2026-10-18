@@ -1,0 +1,7 @@
+name = "aizora-universal-builder-api"
+main = "backend/worker.js"
+compatibility_date = "2026-10-18"
+
+[[r2_buckets]]
+binding = "BUILDS"
+bucket_name = "aizora-universal-builder-builds"
