@@ -89,7 +89,7 @@ export default {
       const ref = env.BUILD_REF || "main";
       const api = await fetch("https://api.github.com/repos/" + repo + "/actions/workflows/build-user-apk.yml/dispatches", {
         method: "POST",
-        headers: { "Authorization": "Bearer " + env.GITHUB_TOKEN, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "AIZORA-Builder" },
+        headers: { "Authorization": "Bearer " + env.GITHUB_TOKEN, "Accept": "application/vnd.github+json", "Content-Type": "application/json", "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "AIZORA-Builder" },
         body: JSON.stringify({ ref, inputs: { build_id: buildId, project_name: projectName } })
       });
       if (!api.ok) return json({ error: "GitHub Actions dispatch ব্যর্থ (" + api.status + ")। Workflow default branch-এ আছে কি না এবং token-এর Actions permission পরীক্ষা করুন।" }, 502, headers);
