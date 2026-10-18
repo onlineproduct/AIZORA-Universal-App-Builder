@@ -24,6 +24,17 @@ export default {
     if (request.headers.get("Origin") && request.headers.get("Origin") !== (env.ALLOWED_ORIGIN || "https://onlineproduct.github.io")) {
       return json({ error: "Origin not allowed" }, 403, headers);
     }
+    if (url.pathname === "/api/build-source" && request.method === "GET") {
+      if (!env.BUILD_DOWNLOAD_TOKEN || request.headers.get("Authorization") !== "Bearer " + env.BUILD_DOWNLOAD_TOKEN) {
+        return new Response("Unauthorized", { status: 401, headers });
+      }
+      const buildId = url.searchParams.get("build_id") || "";
+      if (!/^[0-9a-f-]{36}$/i.test(buildId)) return new Response("Invalid build_id", { status: 400, headers });
+      const object = await env.BUILDS?.get("builds/" + buildId + "/source.zip");
+      if (!object) return new Response("Build source not found", { status: 404, headers });
+      return new Response(object.body, { status: 200, headers: { ...headers, "content-type": "application/zip", "cache-control": "no-store" } });
+    }
+
     if (request.headers.get("x-app-access-code") !== env.APP_ACCESS_CODE || !env.APP_ACCESS_CODE) {
       return json({ error: "Invalid App Access Code. Worker secret APP_ACCESS_CODE সেট করুন।" }, 401, headers);
     }
@@ -85,16 +96,6 @@ export default {
       return json({ ok: true, buildId, actionsUrl: "https://github.com/" + repo + "/actions/workflows/build-user-apk.yml" }, 202, headers);
     }
 
-    if (url.pathname === "/api/build-source" && request.method === "GET") {
-      if (!env.BUILD_DOWNLOAD_TOKEN || request.headers.get("Authorization") !== "Bearer " + env.BUILD_DOWNLOAD_TOKEN) {
-        return new Response("Unauthorized", { status: 401, headers });
-      }
-      const buildId = url.searchParams.get("build_id") || "";
-      if (!/^[0-9a-f-]{36}$/i.test(buildId)) return new Response("Invalid build_id", { status: 400, headers });
-      const object = await env.BUILDS?.get("builds/" + buildId + "/source.zip");
-      if (!object) return new Response("Build source not found", { status: 404, headers });
-      return new Response(object.body, { status: 200, headers: { ...headers, "content-type": "application/zip", "cache-control": "no-store" } });
-    }
     return json({ error: "Not found" }, 404, headers);
   }
 };
