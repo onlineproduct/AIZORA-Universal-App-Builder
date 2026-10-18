@@ -3,7 +3,7 @@ name: Build AIZORA Builder Android APK
 on:
   push:
     branches:
-      - android-apk
+      - no-r2-apk-build
     paths:
       - 'android-app/**'
       - '.github/workflows/android-apk.yml'
