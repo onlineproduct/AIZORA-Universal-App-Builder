@@ -1,9 +1,7 @@
-name = "aizora-universal-app-builder-ai"
+name = "aizora-universal-builder-api"
 main = "src/index.js"
 compatibility_date = "2026-10-19"
 
 [vars]
-AI_API_URL = "https://openrouter.ai/api/v1/chat/completions"
-AI_MODEL = "openai/gpt-4o-mini"
-# Add comma-separated allowed origins after you deploy the app, for example:
-# ALLOWED_ORIGINS = "https://onlineproduct.github.io"
+AI_API_URL = "https://api.openai.com/v1/chat/completions"
+AI_MODEL = "gpt-4o-mini"
