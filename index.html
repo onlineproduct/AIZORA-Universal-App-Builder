@@ -71,12 +71,12 @@ $('exportZip').onclick=async()=>{const p=current();if(!p)return;const btn=$('exp
 
 const AI_ENDPOINT_KEY='aizora_ai_backend_url_v1';
 $('aiEndpoint').value=localStorage.getItem(AI_ENDPOINT_KEY)||'';
-$('aiEndpoint').addEventListener('change',()=>localStorage.setItem(AI_ENDPOINT_KEY,$('aiEndpoint').value.trim().replace(/\\/$/,'')));
+$('aiEndpoint').addEventListener('change',()=>{const v=$('aiEndpoint').value.trim();localStorage.setItem(AI_ENDPOINT_KEY,v.endsWith('/')?v.slice(0,-1):v)});
 $('runAI').onclick=async()=>{
- const endpoint=$('aiEndpoint').value.trim().replace(/\\/$/,'');
+ const rawEndpoint=$('aiEndpoint').value.trim(); const endpoint=rawEndpoint.endsWith('/')?rawEndpoint.slice(0,-1):rawEndpoint;
  const task=$('aiTask').value.trim(), mode=$('aiMode').value, language=$('aiLanguage').value, source=$('aiSource').value;
  if(!endpoint)return $('aiStatus').textContent='আগে Cloudflare Worker AI Backend URL দিন।';
- if(!/^https:\\/\\//i.test(endpoint))return $('aiStatus').textContent='সঠিক HTTPS Backend URL দিন।';
+  if(!endpoint.startsWith('https://'))return $('aiStatus').textContent='সঠিক HTTPS Backend URL দিন।';
  if(!task)return $('aiStatus').textContent='কী কাজ করতে হবে তা লিখুন।';
  if((mode==='fix'||mode==='explain')&&!source.trim())return $('aiStatus').textContent='Fix/Explain-এর জন্য বর্তমান কোড দিন।';
  const btn=$('runAI');btn.disabled=true;$('saveAI').disabled=true;$('aiStatus').textContent='AI-এর সঙ্গে সংযোগ হচ্ছে…';
