@@ -1,0 +1,75 @@
+name: Build Any Android Project APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_dir:
+        description: "Repository folder containing the Android Gradle project (example: projects/my-app)"
+        required: true
+        default: "projects/my-app"
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - "projects/**"
+      - ".github/workflows/build-android-project.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Validate project folder
+        env:
+          PROJECT_DIR: ${{ inputs.project_dir || 'projects/my-app' }}
+        run: |
+          set -euo pipefail
+          case "$PROJECT_DIR" in
+            ""|/*|*..* ) echo "Invalid project folder"; exit 1 ;;
+          esac
+          test -d "$PROJECT_DIR" || { echo "Folder not found: $PROJECT_DIR"; exit 1; }
+          test -f "$PROJECT_DIR/settings.gradle" -o -f "$PROJECT_DIR/settings.gradle.kts" || {
+            echo "Android Gradle project needs settings.gradle or settings.gradle.kts"; exit 1;
+          }
+          test -f "$PROJECT_DIR/build.gradle" -o -f "$PROJECT_DIR/build.gradle.kts" || {
+            echo "Project root needs build.gradle or build.gradle.kts"; exit 1;
+          }
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses >/dev/null || true
+
+      - name: Build debug APK
+        run: |
+          set -euo pipefail
+          cd "$PROJECT_DIR"
+          if [ -f ./gradlew ]; then
+            chmod +x ./gradlew
+            ./gradlew --no-daemon assembleDebug
+          else
+            gradle --no-daemon assembleDebug
+          fi
+
+      - name: Upload APK files
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-APK-${{ github.run_number }}
+          path: |
+            ${{ env.PROJECT_DIR }}/**/build/outputs/apk/**/*.apk
+          if-no-files-found: error
+          retention-days: 14
