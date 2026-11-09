@@ -32,9 +32,31 @@ function base64Url(bytes) {
 }
 
 function pemToBytes(pem) {
-  const clean = pem.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, "");
+  const isPkcs1 = pem.includes("-----BEGIN RSA PRIVATE KEY-----");
+  const clean = pem.replace(/-----BEGIN (?:RSA )?PRIVATE KEY-----|-----END (?:RSA )?PRIVATE KEY-----|\\s/g, "");
   const binary = atob(clean);
-  return Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  const raw = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  if (!isPkcs1) return raw;
+  const lengthBytes = (length) => {
+    if (length < 128) return Uint8Array.of(length);
+    const bytes = [];
+    while (length > 0) { bytes.unshift(length & 255); length >>>= 8; }
+    return Uint8Array.from([0x80 | bytes.length, ...bytes]);
+  };
+  const tlv = (tag, value) => {
+    const len = lengthBytes(value.length);
+    const result = new Uint8Array(1 + len.length + value.length);
+    result[0] = tag; result.set(len, 1); result.set(value, 1 + len.length);
+    return result;
+  };
+  const algorithm = Uint8Array.from([0x30,0x0d,0x06,0x09,0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x01,0x01,0x05,0x00]);
+  const version = Uint8Array.from([0x02,0x01,0x00]);
+  const privateKey = tlv(0x04, raw);
+  const body = new Uint8Array(version.length + algorithm.length + privateKey.length);
+  body.set(version, 0);
+  body.set(algorithm, version.length);
+  body.set(privateKey, version.length + algorithm.length);
+  return tlv(0x30, body);
 }
 
 async function createAppJwt(env) {
