@@ -26,6 +26,19 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+      - name: Validate Visual Designer JavaScript syntax
+        working-directory: ${{ github.workspace }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("designer.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script>([\s\S]*?)</script>", html)
+          if not scripts:
+              raise SystemExit("No inline Designer script found")
+          Path("/tmp/aizora-designer.js").write_text(scripts[-1], encoding="utf-8")
+          PY
+          node --check /tmp/aizora-designer.js
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
