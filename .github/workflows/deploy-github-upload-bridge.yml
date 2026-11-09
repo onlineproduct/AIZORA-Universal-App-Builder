@@ -1,0 +1,74 @@
+name: Deploy GitHub Upload Bridge
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "workers/github-upload-bridge/**"
+      - ".github/workflows/deploy-github-upload-bridge.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aizora-github-upload-bridge-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Wrangler
+        run: npm install --global wrangler@4
+
+      - name: Validate required secrets
+        shell: bash
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          APP_ORIGIN: ${{ secrets.CF_WORKER_APP_ORIGIN }}
+          ALLOWED_LOGIN: ${{ secrets.CF_ALLOWED_GITHUB_LOGIN }}
+          OAUTH_CLIENT_ID: ${{ secrets.CF_GITHUB_OAUTH_CLIENT_ID }}
+          GITHUB_APP_ID: ${{ secrets.CF_GITHUB_APP_ID }}
+          INSTALLATION_ID: ${{ secrets.CF_GITHUB_INSTALLATION_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.CF_GITHUB_APP_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          for name in CF_API_TOKEN CF_ACCOUNT_ID APP_ORIGIN ALLOWED_LOGIN OAUTH_CLIENT_ID GITHUB_APP_ID INSTALLATION_ID APP_PRIVATE_KEY; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::Missing required GitHub Actions secret for ${name}"
+              exit 1
+            fi
+          done
+
+      - name: Deploy Worker and update private key
+        working-directory: workers/github-upload-bridge
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          APP_ORIGIN: ${{ secrets.CF_WORKER_APP_ORIGIN }}
+          ALLOWED_LOGIN: ${{ secrets.CF_ALLOWED_GITHUB_LOGIN }}
+          OAUTH_CLIENT_ID: ${{ secrets.CF_GITHUB_OAUTH_CLIENT_ID }}
+          GITHUB_APP_ID: ${{ secrets.CF_GITHUB_APP_ID }}
+          INSTALLATION_ID: ${{ secrets.CF_GITHUB_INSTALLATION_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.CF_GITHUB_APP_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$APP_PRIVATE_KEY" | wrangler secret put GITHUB_APP_PRIVATE_KEY --name aizora-github-upload-bridge
+          wrangler deploy \
+            --name aizora-github-upload-bridge \
+            --var "APP_ORIGIN:$APP_ORIGIN" \
+            --var "ALLOWED_GITHUB_LOGIN:$ALLOWED_LOGIN" \
+            --var "GITHUB_OAUTH_CLIENT_ID:$OAUTH_CLIENT_ID" \
+            --var "GITHUB_APP_ID:$GITHUB_APP_ID" \
+            --var "GITHUB_INSTALLATION_ID:$INSTALLATION_ID"
