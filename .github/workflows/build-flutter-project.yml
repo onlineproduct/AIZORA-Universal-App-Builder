@@ -1,0 +1,77 @@
+name: Build Generated Flutter Project APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_dir:
+        description: "Repository folder containing pubspec.yaml and lib/main.dart"
+        required: true
+        default: "projects/flutter-source-demo/flutter"
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - "projects/**/flutter/**"
+      - ".github/workflows/build-flutter-project.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-flutter-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout generated project source
+        uses: actions/checkout@v4
+
+      - name: Validate Flutter source folder
+        env:
+          PROJECT_DIR: ${{ inputs.project_dir || 'projects/flutter-source-demo/flutter' }}
+        run: |
+          set -euo pipefail
+          case "$PROJECT_DIR" in
+            ""|/*|*..*) echo "Invalid project folder"; exit 1 ;;
+          esac
+          test -f "$PROJECT_DIR/pubspec.yaml" || { echo "pubspec.yaml not found"; exit 1; }
+          test -f "$PROJECT_DIR/lib/main.dart" || { echo "lib/main.dart not found"; exit 1; }
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Create Android platform wrapper
+        run: |
+          set -euo pipefail
+          BUILD_DIR="$RUNNER_TEMP/aizora_flutter_build"
+          APP_NAME="$(basename "$PROJECT_DIR" | tr '-' '_' | tr -cd '[:alnum:]_')"
+          [ -n "$APP_NAME" ] || APP_NAME="aizora_generated_app"
+          flutter create --platforms=android --project-name "$APP_NAME" "$BUILD_DIR"
+          cp -a "$PROJECT_DIR/." "$BUILD_DIR/"
+          echo "BUILD_DIR=$BUILD_DIR" >> "$GITHUB_ENV"
+
+      - name: Resolve Flutter dependencies
+        run: |
+          cd "$BUILD_DIR"
+          flutter pub get
+
+      - name: Analyze generated Flutter project
+        run: |
+          cd "$BUILD_DIR"
+          flutter analyze --no-pub
+
+      - name: Build generated Android APK
+        run: |
+          cd "$BUILD_DIR"
+          flutter build apk --debug --no-pub
+
+      - name: Upload generated project APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AIZORA-Generated-Project-APK-${{ github.run_number }}
+          path: ${{ env.BUILD_DIR }}/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
