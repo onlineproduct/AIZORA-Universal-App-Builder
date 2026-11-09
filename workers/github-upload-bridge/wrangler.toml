@@ -3,8 +3,6 @@ main = "src/index.js"
 compatibility_date = "2026-11-09"
 
 [vars]
-GITHUB_REPOSITORY = "onlineproduct/AIZORA-Universal-App-Builder"
-GITHUB_BRANCH = "main"
 # Set these values before deployment:
 APP_ORIGIN = "https://YOUR-BUILDER-ORIGIN"
 ALLOWED_GITHUB_LOGIN = "YOUR_GITHUB_LOGIN"
