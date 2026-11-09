@@ -101,8 +101,41 @@ return '<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="v
 $('exportHtml').onclick=()=>download(html(),'aizora-generated-app.html','text/html');
 
 function dartQuote(v){return JSON.stringify(String(v??'')).split('$').join(String.fromCharCode(92)+'$')}
-function dartWidget(c){if(c.type==='heading'||c.type==='text')return 'Text('+dartQuote(c.text||'')+')';if(c.type==='button')return 'ElevatedButton(onPressed: () {}, child: Text('+dartQuote(c.text||'Button')+'))';if(c.type==='input')return 'TextField(decoration: InputDecoration(hintText: '+dartQuote(c.placeholder||'')+'))';if(c.type==='image')return c.src?'Image.network('+dartQuote(c.src)+')':'const SizedBox.shrink()';if(c.type==='divider')return 'const Divider()';if(c.type==='spacer')return 'SizedBox(height: '+(Number(c.height)||32)+')';return 'Container(width: double.infinity, padding: const EdgeInsets.all(12), child: Text('+dartQuote(c.text||'Container')+'))'}
-function flutterMainDart(){const nl=String.fromCharCode(10),lines=["import 'package:flutter/material.dart';",'','void main() => runApp(const AizoraApp());','','class AizoraApp extends StatelessWidget {','  const AizoraApp({super.key});','  @override','  Widget build(BuildContext context) => MaterialApp(','    title: '+dartQuote(project.name||'AIZORA App')+',','    initialRoute: "/page0",','    routes: {'];project.screens.forEach((s,i)=>lines.push('      "/page'+i+'": (context) => Page'+i+'(),'));lines.push('    },','  );','}');project.screens.forEach((s,i)=>{lines.push('','class Page'+i+' extends StatelessWidget {','  const Page'+i+'({super.key});','  @override','  Widget build(BuildContext context) => Scaffold(','    appBar: AppBar(title: Text('+dartQuote(s.name||'Screen')+'), actions: [PopupMenuButton<String>(onSelected: (v) => Navigator.pushReplacementNamed(context, v), itemBuilder: (context) => [');project.screens.forEach((q,j)=>lines.push('      PopupMenuItem(value: "/page'+j+'", child: Text('+dartQuote(q.name||'Screen')+')),'));lines.push('    ])]),','    body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [');s.components.forEach(c=>lines.push('      '+dartWidget(c)+','));lines.push('    ])),','  );','}');});return lines.join(nl)+nl}
+function dartColor(v,fallback='0x00000000'){const m=String(v||'').match(/^#?([0-9a-f]{6})$/i);return m?'const Color(0xFF'+m[1].toUpperCase()+')':'const Color('+fallback+')'}
+function dartNumber(v,fallback=0){const n=Number.parseFloat(v);return Number.isFinite(n)?String(n):String(fallback)}
+function dartWidth(v){if(v===undefined||v===null||v===''||v==='auto')return '';if(String(v).trim().endsWith('%'))return 'double.infinity';return dartNumber(String(v).replace(/px$/,''),0)}
+function dartWidget(c){
+ const color=dartColor(c.color,'0xFF182338'),bg=dartColor(c.background,'0x00000000');
+ const pad='const EdgeInsets.all('+dartNumber(c.padding,6)+')';
+ const radius='BorderRadius.circular('+dartNumber(c.radius,0)+')';
+ const width=dartWidth(c.width),height=dartWidth(c.height);
+ const size=[c.width&&c.width!=='auto'?'width: '+width:null,c.height&&c.height!=='auto'?'height: '+height:null].filter(Boolean).join(', ');
+ if(c.type==='heading'||c.type==='text'){
+  return 'Text('+dartQuote(c.text||'')+', textAlign: TextAlign.'+(['left','center','right'].includes(c.align)?c.align:'left')+', style: TextStyle(fontSize: '+dartNumber(c.fontSize,c.type==='heading'?24:16)+', color: '+color+', fontWeight: FontWeight.'+(c.bold?'bold':'normal')+'))';
+ }
+ if(c.type==='button'){
+  return 'ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: '+bg+', foregroundColor: '+color+', padding: '+pad+', shape: RoundedRectangleBorder(borderRadius: '+radius+')), child: Text('+dartQuote(c.text||'Button')+'))';
+ }
+ if(c.type==='input')return 'TextField(decoration: InputDecoration(hintText: '+dartQuote(c.placeholder||c.text||'')+', border: const OutlineInputBorder()))';
+ if(c.type==='image')return c.src?'Image.network('+dartQuote(c.src)+', fit: BoxFit.contain)':'const SizedBox.shrink()';
+ if(c.type==='divider')return 'const Divider()';
+ if(c.type==='spacer')return 'SizedBox(height: '+dartNumber(c.height,32)+')';
+ const child='Text('+dartQuote(c.text||'Container')+', style: TextStyle(color: '+color+'))';
+ return 'Container('+[size,pad,'decoration: BoxDecoration(color: '+bg+', borderRadius: '+radius+')','child: '+child].filter(Boolean).join(', ')+')';
+}
+function flutterMainDart(){
+ const nl=String.fromCharCode(10),lines=["import 'package:flutter/material.dart';",'','void main() => runApp(const AizoraApp());','','class AizoraApp extends StatelessWidget {','  const AizoraApp({super.key});','  @override','  Widget build(BuildContext context) => MaterialApp(','    title: '+dartQuote(project.name||'AIZORA App')+',','    initialRoute: "/page0",','    routes: {'];
+ project.screens.forEach((s,i)=>lines.push('      "/page'+i+'": (context) => Page'+i+'(),'));
+ lines.push('    },','  );','}');
+ project.screens.forEach((s,i)=>{
+  lines.push('','class Page'+i+' extends StatelessWidget {','  const Page'+i+'({super.key});','  @override','  Widget build(BuildContext context) => Scaffold(','    backgroundColor: '+dartColor(s.background,'0xFFFFFFFF')+',','    appBar: AppBar(title: Text('+dartQuote(s.name||'Screen')+'), actions: [PopupMenuButton<String>(onSelected: (v) => Navigator.pushReplacementNamed(context, v), itemBuilder: (context) => [');
+  project.screens.forEach((q,j)=>lines.push('      PopupMenuItem(value: "/page'+j+'", child: Text('+dartQuote(q.name||'Screen')+')),'));
+  lines.push('    ])]),','    body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [');
+  s.components.forEach(c=>lines.push('      '+dartWidget(c)+','));
+  lines.push('    ])),','  );','}');
+ });
+ return lines.join(nl)+nl;
+}
 function flutterPubspec(){const n=(project.name||'aizora_app').toLowerCase().replace(/[^a-z0-9_]+/g,'_').replace(/^_+|_+$/g,'')||'aizora_app';return ['name: '+n,'description: Generated by AIZORA App Builder',"publish_to: 'none'",'version: 1.0.0+1','','environment:',"  sdk: '>=3.3.0 <4.0.0'",'','dependencies:','  flutter:','    sdk: flutter','','flutter:','  uses-material-design: true',''].join(String.fromCharCode(10))}
 async function saveFlutterFiles(dart,yaml){
  const p=selectedBuilderProject();
