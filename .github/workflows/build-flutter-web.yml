@@ -8,6 +8,10 @@ on:
         required: true
         default: "projects/flutter-source-demo/flutter"
         type: string
+  pull_request:
+    paths:
+      - "projects/**/flutter/**"
+      - ".github/workflows/build-flutter-web.yml"
   push:
     branches: [main]
     paths:
