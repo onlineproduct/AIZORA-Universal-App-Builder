@@ -50,7 +50,7 @@ jobs:
             fi
           done
 
-      - name: Deploy Worker and update private key
+      - name: Deploy Worker
         working-directory: workers/github-upload-bridge
         shell: bash
         env:
@@ -64,7 +64,7 @@ jobs:
           APP_PRIVATE_KEY: ${{ secrets.CF_GITHUB_APP_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          printf '%s' "$APP_PRIVATE_KEY" | wrangler secret put GITHUB_APP_PRIVATE_KEY --name aizora-github-upload-bridge
+          # Create/update the Worker first; secret put requires an existing script.
           wrangler deploy \
             --name aizora-github-upload-bridge \
             --var "APP_ORIGIN:$APP_ORIGIN" \
@@ -72,3 +72,5 @@ jobs:
             --var "GITHUB_OAUTH_CLIENT_ID:$OAUTH_CLIENT_ID" \
             --var "GITHUB_APP_ID:$GITHUB_APP_ID" \
             --var "GITHUB_INSTALLATION_ID:$INSTALLATION_ID"
+          # Then attach the private key as an encrypted Worker secret.
+          printf '%s' "$APP_PRIVATE_KEY" | wrangler secret put GITHUB_APP_PRIVATE_KEY --name aizora-github-upload-bridge
