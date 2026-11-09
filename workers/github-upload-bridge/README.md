@@ -30,9 +30,9 @@ A small Cloudflare Worker that lets the AIZORA Universal App Builder send a sele
    | `CF_GITHUB_INSTALLATION_ID` | GitHub App installation ID for this repository |
    | `CF_GITHUB_APP_PRIVATE_KEY` | Full GitHub App private key PEM |
 
-   Create the Cloudflare API token with the permissions needed to edit/deploy Workers for this account. Keep all values in GitHub Secrets; never commit them or paste them into ChatGPT.
+   Create the Cloudflare API token with **Account → Workers Scripts → Edit** permission for the correct account (and any additional permission Cloudflare's current token UI marks as required for Worker deployment). Keep all values in GitHub Secrets; never commit them or paste them into ChatGPT.
 
-4. Run **Actions → Deploy GitHub Upload Bridge → Run workflow**. The workflow installs Wrangler, stores the private key as a Worker secret, and deploys the Worker with the other account-specific settings.
+4. Run **Actions → Deploy GitHub Upload Bridge → Run workflow**. The workflow deploys the Worker first, then stores the private key as an encrypted Worker secret. This order ensures the Worker script exists before `wrangler secret put` runs.
 5. After a successful deployment, set the Worker URL in the Builder's GitHub connection settings and use **Connect GitHub**. Complete the GitHub Device Flow approval.
 
 The workflow also runs automatically when files under `workers/github-upload-bridge/**` or the deployment workflow change on `main`. It is not possible to deploy until all eight repository secrets above are configured.
@@ -44,11 +44,11 @@ From this folder:
 ```sh
 npm install -g wrangler
 wrangler login
-wrangler secret put GITHUB_APP_PRIVATE_KEY
 wrangler deploy
+wrangler secret put GITHUB_APP_PRIVATE_KEY
 ```
 
-If deploying manually, set the values in `wrangler.toml` first. Paste the PEM only into the Wrangler terminal prompt. Never put it in source files or the repository.
+If deploying manually, set the values in `wrangler.toml` first. Deploy the Worker before setting the secret, then paste the PEM only into the Wrangler terminal prompt. Never put it in source files or the repository.
 
 ## Endpoints
 
