@@ -1,6 +1,5 @@
 const GITHUB_API = "https://api.github.com";
 const GITHUB_API_VERSION = "2022-11-28";
-const COOKIE_NAME = "aizora_github_session";
 const MAX_FILES = 200;
 const MAX_TOTAL_BYTES = 50 * 1024 * 1024;
 
@@ -20,16 +19,10 @@ function corsHeaders(request, env) {
     "access-control-allow-origin": origin,
     "access-control-allow-credentials": "true",
     "access-control-allow-methods": "GET, POST, OPTIONS",
-    "access-control-allow-headers": "content-type",
+    "access-control-allow-headers": "content-type, authorization",
     "access-control-max-age": "86400",
     "vary": "Origin",
   };
-}
-
-function cookieValue(request, name) {
-  const header = request.headers.get("Cookie") || "";
-  const part = header.split(";").map((x) => x.trim()).find((x) => x.startsWith(name + "="));
-  return part ? decodeURIComponent(part.slice(name.length + 1)) : "";
 }
 
 function base64Url(bytes) {
@@ -217,15 +210,15 @@ export default {
         if (!env.ALLOWED_GITHUB_LOGIN || user.login.toLowerCase() !== env.ALLOWED_GITHUB_LOGIN.toLowerCase()) {
           return json({ error: "This GitHub account is not allowed." }, 403, cors);
         }
-        const cookie = COOKIE_NAME + "=" + encodeURIComponent(data.access_token) + "; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=28800";
-        return json({ ok: true, login: user.login }, 200, { ...cors, "set-cookie": cookie });
+        return json({ ok: true, login: user.login, access_token: data.access_token }, 200, cors);
       }
       if (request.method === "POST" && url.pathname === "/auth/logout") {
-        return json({ ok: true }, 200, { ...cors, "set-cookie": COOKIE_NAME + "=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0" });
+        return json({ ok: true }, 200, cors);
       }
       const match = url.pathname.match(/^\/api\/projects\/([a-z0-9][a-z0-9_-]{0,49})\/upload$/);
       if (request.method === "POST" && match) {
-        const token = cookieValue(request, COOKIE_NAME);
+        const authorization = request.headers.get("Authorization") || "";
+        const token = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
         if (!token) return json({ error: "GitHub is not connected. Connect GitHub again." }, 401, cors);
         const result = await uploadProject(request, env, match[1], token);
         return json(result, 200, cors);
