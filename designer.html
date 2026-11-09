@@ -16,7 +16,18 @@ header{height:auto;min-height:58px;padding:10px 16px;display:flex;align-items:ce
 </style>
 </head>
 <body>
-<header><div><strong>🧩 AIZORA Visual Designer</strong><div class="muted">প্রথম সংস্করণ · Screen Canvas & Component Properties</div></div><div class="actions"><button class="secondary" id="back">← Builder</button><select id="builderProject" title="My Projects থেকে প্রজেক্ট নির্বাচন"></select><button class="secondary" id="loadFromProject">Load Project Design</button><button class="secondary" id="saveToProject">Save to My Projects</button><button class="secondary" id="newScreen">＋ Screen</button><button class="secondary" id="exportJson">Export JSON</button><button class="secondary" id="importJson">Import JSON</button><button id="exportHtml">Generate HTML</button><button id="generateFlutter">Generate Flutter Code</button><button class="secondary" id="downloadDart">Download main.dart</button><button class="secondary" id="downloadPubspec">Download pubspec.yaml</button><button class="secondary" id="exportFlutterZip">Export Flutter Build ZIP</button></div></header>
+<header><div><strong>🧩 AIZORA Visual Designer</strong><div class="muted">প্রথম সংস্করণ · Screen Canvas & Component Properties</div></div><div class="actions"><button class="secondary" id="back">← Builder</button><select id="builderProject" title="My Projects থেকে প্রজেক্ট নির্বাচন"></select><button class="secondary" id="loadFromProject">Load Project Design</button><button class="secondary" id="saveToProject">Save to My Projects</button><button class="secondary" id="newScreen">＋ Screen</button><button class="secondary" id="exportJson">Export JSON</button><button class="secondary" id="importJson">Import JSON</button><button id="exportHtml">Generate HTML</button><button id="generateFlutter">Generate Flutter Code</button><button class="secondary" id="downloadDart">Download main.dart</button><button class="secondary" id="downloadPubspec">Download pubspec.yaml</button><button class="secondary" id="exportFlutterZip">Prepare APK Build ZIP</button></div></header>
+<section id="githubBridgePanel" style="max-width:1500px;margin:12px auto;padding:12px 16px;background:#17263b;border:1px solid #334862;border-radius:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+ <strong style="margin-right:8px">🔐 GitHub APK Upload</strong>
+ <input id="githubWorkerUrl" type="url" placeholder="Cloudflare Worker URL (https://…workers.dev)" style="flex:1;min-width:220px;max-width:420px">
+ <button class="secondary" id="saveGithubWorker">Save Worker URL</button>
+ <button class="secondary" id="connectGithub">Connect GitHub</button>
+ <button class="secondary" id="logoutGithub">Disconnect</button>
+ <button id="uploadAndBuild">Upload Project & Build APK</button>
+ <span id="githubBridgeStatus" class="muted" style="flex-basis:100%">একবার Cloudflare Worker সেটআপ করে URL দিন, তারপর GitHub Device Flow দিয়ে অনুমোদন করুন।</span>
+ <a id="githubVerifyLink" href="#" target="_blank" rel="noopener" hidden style="color:#9fc4ff">Open GitHub verification</a>
+ <a id="githubActionsLink" href="#" target="_blank" rel="noopener" hidden style="color:#9fc4ff">Open GitHub Actions</a>
+</section>
 <div class="workspace">
 <aside class="panel left"><h2>Components</h2><p class="muted">ক্যানভাসে টেনে আনুন অথবা চাপ দিন</p><div class="palette" id="palette">
 <div class="component" draggable="true" data-type="text"><span>𝐓</span>Text</div>
@@ -43,6 +54,7 @@ function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&
 function screen(){return project.screens.find(s=>s.id===screenId)||project.screens[0]}
 const BUILDER_DB='aizora_universal_builder_db_v1',BUILDER_STORE='projects';
 let builderDb=null,builderProjects=[];
+let githubOAuthToken='',githubLogin='';
 function openBuilderDb(){return new Promise((resolve,reject)=>{const r=indexedDB.open(BUILDER_DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(BUILDER_STORE))r.result.createObjectStore(BUILDER_STORE)};r.onsuccess=()=>{builderDb=r.result;resolve(builderDb)};r.onerror=()=>reject(r.error||Error('Project database open failed'))})}
 function getBuilderProjects(){return new Promise((resolve,reject)=>{const r=builderDb.transaction(BUILDER_STORE,'readonly').objectStore(BUILDER_STORE).get('all');r.onsuccess=()=>resolve(Array.isArray(r.result)?r.result:[]);r.onerror=()=>reject(r.error)})}
 function putBuilderProjects(){return new Promise((resolve,reject)=>{const tx=builderDb.transaction(BUILDER_STORE,'readwrite');tx.objectStore(BUILDER_STORE).put(builderProjects,'all');tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error||Error('Project save failed'));tx.onabort=()=>reject(tx.error||Error('Project save aborted'))})}
@@ -129,6 +141,93 @@ async function loadDesignerZipLibrary(){
   s.onerror=()=>reject(Error('ZIP library load failed'));document.head.append(s);
  });
 }
+
+const GITHUB_WORKER_KEY='aizora_github_upload_worker_url_v1';
+$('githubWorkerUrl').value=localStorage.getItem(GITHUB_WORKER_KEY)||'';
+function workerBase(){const value=$('githubWorkerUrl').value.trim().replace(/\/+$/,'');if(!value)throw Error('আগে Cloudflare Worker URL দিন');const u=new URL(value);if(u.protocol!=='https:')throw Error('Worker URL অবশ্যই HTTPS হতে হবে');return value}
+$('saveGithubWorker').onclick=()=>{try{const value=workerBase();localStorage.setItem(GITHUB_WORKER_KEY,value);$('githubBridgeStatus').textContent='Worker URL সংরক্ষিত ✓'}catch(e){$('githubBridgeStatus').textContent=e.message}};
+async function bridgeRequest(path,options={}){
+ const base=workerBase();
+ const headers={...(options.body?{'content-type':'application/json'}:{}),...(options.headers||{})};
+ const response=await fetch(base+path,{method:options.method||'GET',headers,body:options.body,credentials:'omit'});
+ let data={};try{data=await response.json()}catch{}
+ if(!response.ok)throw Error(data.error||data.message||('Worker request failed: '+response.status));
+ return {data,status:response.status};
+}
+const waitMs=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+$('connectGithub').onclick=async()=>{
+ const btn=$('connectGithub');btn.disabled=true;githubOAuthToken='';githubLogin='';
+ let verificationTab=null;
+ try{
+  workerBase();localStorage.setItem(GITHUB_WORKER_KEY,workerBase());
+  verificationTab=window.open('about:blank','_blank');
+  $('githubBridgeStatus').textContent='GitHub Device Flow শুরু হচ্ছে…';
+  const {data}=await bridgeRequest('/auth/device-code',{method:'POST',body:'{}'});
+  if(!data.device_code||!data.user_code||!data.verification_uri)throw Error('GitHub Device Flow-এর উত্তর অসম্পূর্ণ');
+  $('githubBridgeStatus').textContent='GitHub verification page-এ এই কোডটি দিন: '+data.user_code+' — অনুমোদনের অপেক্ষা চলছে…';
+  $('githubVerifyLink').href=data.verification_uri;$('githubVerifyLink').hidden=false;
+  if(verificationTab)verificationTab.location.href=data.verification_uri;else window.open(data.verification_uri,'_blank','noopener');
+  let interval=Math.max(5,Number(data.interval)||5),connected=false;
+  for(let attempt=0;attempt<120;attempt++){
+   await waitMs(interval*1000);
+   const result=await bridgeRequest('/auth/access-token',{method:'POST',body:JSON.stringify({device_code:data.device_code})});
+   if(result.status===202){
+    const error=result.data.error;
+    if(error==='authorization_pending')continue;
+    if(error==='slow_down'){interval+=5;continue}
+    throw Error(result.data.error_description||error||'GitHub অনুমোদন ব্যর্থ');
+   }
+   if(!result.data.access_token)throw Error('GitHub access token পাওয়া যায়নি');
+   githubOAuthToken=result.data.access_token;githubLogin=result.data.login||'GitHub user';connected=true;break;
+  }
+  if(!connected)throw Error('GitHub অনুমোদনের সময় শেষ হয়েছে। আবার Connect GitHub চাপুন।');
+  $('githubBridgeStatus').textContent='GitHub সংযুক্ত ✓ '+githubLogin+' (এই Designer tab খোলা থাকা পর্যন্ত)';$('githubVerifyLink').hidden=true;
+ }catch(e){if(verificationTab&&!verificationTab.closed)verificationTab.close();$('githubBridgeStatus').textContent='GitHub সংযোগ ব্যর্থ: '+e.message;alert(e.message)}
+ finally{btn.disabled=false}
+};
+$('logoutGithub').onclick=()=>{githubOAuthToken='';githubLogin='';$('githubBridgeStatus').textContent='GitHub সংযোগ বিচ্ছিন্ন হয়েছে। আবার Connect GitHub চাপলে অনুমোদন করতে পারবেন।';$('githubActionsLink').hidden=true;$('githubVerifyLink').hidden=true};
+function bytesToBase64(value){
+ const bytes=value instanceof Uint8Array?value:new Uint8Array(value);
+ let binary='';const chunk=0x8000;
+ for(let i=0;i<bytes.length;i+=chunk)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+chunk,bytes.length)));
+ return btoa(binary);
+}
+async function projectFileBase64(file){
+ if(file.binary){
+  if(!file.bytes)throw Error('Binary asset-এর data নেই: '+file.path);
+  return bytesToBase64(file.bytes);
+ }
+ return bytesToBase64(new TextEncoder().encode(file.content||''));
+}
+$('uploadAndBuild').onclick=async()=>{
+ const btn=$('uploadAndBuild');btn.disabled=true;btn.textContent='Project Upload হচ্ছে…';
+ $('githubActionsLink').hidden=true;
+ try{
+  if(!githubOAuthToken)throw Error('আগে Connect GitHub চাপুন এবং GitHub অনুমোদন সম্পন্ন করুন');
+  const p=selectedBuilderProject();if(!p)throw Error('আগে একটি My Projects প্রজেক্ট নির্বাচন করুন');
+  await saveFlutterFiles(flutterMainDart(),flutterPubspec());
+  const nameSlug=(p.name||'aizora-app').toLowerCase().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'aizora-app';
+  const idSuffix=String(p.id||'').replace(/[^a-z0-9]/gi,'').slice(0,8).toLowerCase()||'project';
+  const slug=(nameSlug+'-'+idSuffix).slice(0,50);
+  const selected=(p.files||[]).filter(f=>typeof f.path==='string'&&f.path.startsWith('flutter/'));
+  const files=[];
+  for(const f of selected){
+   const path=f.path.slice(8);if(!path||path.split('/').some(x=>!x||x==='.'||x==='..'))continue;
+   files.push({path,contentBase64:await projectFileBase64(f)});
+  }
+  const paths=new Set(files.map(f=>f.path));
+  if(!paths.has('pubspec.yaml')||!paths.has('lib/main.dart'))throw Error('pubspec.yaml অথবা lib/main.dart নেই');
+  $('githubBridgeStatus').textContent=files.length+'টি ফাইল নিরাপদে GitHub-এ পাঠানো হচ্ছে…';
+  const {data}=await bridgeRequest('/api/projects/'+encodeURIComponent(slug)+'/upload',{
+   method:'POST',headers:{authorization:'Bearer '+githubOAuthToken},body:JSON.stringify({files})
+  });
+  $('githubBridgeStatus').textContent='GitHub Commit সফল ✓ '+data.commit_sha+' · '+data.files_uploaded+' files · APK Workflow শুরু হবে';
+  $('githubActionsLink').href=data.actions_url;$('githubActionsLink').hidden=false;
+  $('status').textContent='GitHub-এ '+data.project_dir+' আপলোড ও Commit হয়েছে ✓';
+ }catch(e){$('githubBridgeStatus').textContent='Upload/Build ব্যর্থ: '+e.message;alert('GitHub Upload ব্যর্থ: '+e.message)}
+ finally{btn.disabled=false;btn.textContent='Upload Project & Build APK'}
+};
+
 $('exportFlutterZip').textContent='Prepare APK Build ZIP';
 $('exportFlutterZip').onclick=async()=>{
  const btn=$('exportFlutterZip');btn.disabled=true;btn.textContent='Generate + Save + ZIP…';

@@ -1,0 +1,11 @@
+name = "aizora-github-upload-bridge"
+main = "src/index.js"
+compatibility_date = "2026-11-09"
+
+[vars]
+# Set these values before deployment:
+APP_ORIGIN = "https://YOUR-BUILDER-ORIGIN"
+ALLOWED_GITHUB_LOGIN = "YOUR_GITHUB_LOGIN"
+GITHUB_OAUTH_CLIENT_ID = "YOUR_GITHUB_OAUTH_APP_CLIENT_ID"
+GITHUB_APP_ID = "YOUR_GITHUB_APP_ID"
+GITHUB_INSTALLATION_ID = "YOUR_GITHUB_APP_INSTALLATION_ID"
