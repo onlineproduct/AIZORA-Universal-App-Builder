@@ -47,7 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           BUILD_DIR="$RUNNER_TEMP/aizora_flutter_build"
-          APP_NAME="$(basename "$PROJECT_DIR" | tr '-' '_' | tr -cd '[:alnum:]_')"
+          APP_NAME="$(basename "$(dirname "$PROJECT_DIR")" | tr '-' '_' | tr -cd '[:alnum:]_')"
           [ -n "$APP_NAME" ] || APP_NAME="aizora_generated_app"
           flutter create --platforms=android --project-name "$APP_NAME" "$BUILD_DIR"
           cp -a "$PROJECT_DIR/." "$BUILD_DIR/"
