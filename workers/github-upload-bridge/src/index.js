@@ -114,8 +114,12 @@ async function uploadProject(request, env, slug, userToken) {
       throw new Error("Invalid file entry.");
     }
     const path = file.path.replace(/^\/+/, "");
-    if (!path || path.split("/").some((part) => !part || part === "." || part === "..") ||
-        !/^[a-zA-Z0-9._/-]+$/.test(path) || path.startsWith(".git/")) {
+    const parts = path.split("/");
+    const lowerPath = path.toLowerCase();
+    const secretLike = parts.some((part) => part === ".git" || part === ".env" || part.startsWith(".env.") || part === "key.properties") ||
+      /\.(pem|p12|pfx|jks|keystore)$/.test(lowerPath);
+    if (!path || parts.some((part) => !part || part === "." || part === "..") ||
+        !/^[a-zA-Z0-9._/-]+$/.test(path) || secretLike) {
       throw new Error("Unsafe project file path: " + path);
     }
     if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(file.contentBase64)) {
@@ -183,10 +187,11 @@ export default {
         return json({ ok: true, service: "AIZORA GitHub Upload Bridge" }, 200, cors);
       }
       if (request.method === "POST" && url.pathname === "/auth/device-code") {
+        const deviceForm = new URLSearchParams({ client_id: env.GITHUB_OAUTH_CLIENT_ID, scope: "read:user" });
         const response = await fetch("https://github.com/login/device/code", {
           method: "POST",
-          headers: { accept: "application/json", "content-type": "application/json" },
-          body: JSON.stringify({ client_id: env.GITHUB_OAUTH_CLIENT_ID, scope: "read:user" }),
+          headers: { accept: "application/json", "content-type": "application/x-www-form-urlencoded" },
+          body: deviceForm.toString(),
         });
         const data = await response.json();
         if (!response.ok || data.error) throw new Error(data.error_description || data.error || "Could not start GitHub sign-in.");
@@ -194,14 +199,15 @@ export default {
       }
       if (request.method === "POST" && url.pathname === "/auth/access-token") {
         const body = await request.json();
+        const tokenForm = new URLSearchParams({
+          client_id: env.GITHUB_OAUTH_CLIENT_ID,
+          device_code: body.device_code,
+          grant_type: "urn:ietf:params:oauth:grant-type:device_code",
+        });
         const response = await fetch("https://github.com/login/oauth/access_token", {
           method: "POST",
-          headers: { accept: "application/json", "content-type": "application/json" },
-          body: JSON.stringify({
-            client_id: env.GITHUB_OAUTH_CLIENT_ID,
-            device_code: body.device_code,
-            grant_type: "urn:ietf:params:oauth:grant-type:device_code",
-          }),
+          headers: { accept: "application/json", "content-type": "application/x-www-form-urlencoded" },
+          body: tokenForm.toString(),
         });
         const data = await response.json();
         if (data.error) return json({ error: data.error, error_description: data.error_description, interval: data.interval }, 202, cors);
