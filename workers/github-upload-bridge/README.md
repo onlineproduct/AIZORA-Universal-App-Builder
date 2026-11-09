@@ -5,13 +5,13 @@ A small Cloudflare Worker that lets the AIZORA Universal App Builder send a sele
 ## Security model
 
 - The browser signs in through GitHub OAuth Device Flow. It never asks the user to paste a PAT.
-- The OAuth access token is returned to the Worker and stored only in a Secure, HttpOnly, SameSite=None cookie. JavaScript cannot read it; it is not written to localStorage or IndexedDB.
+- The OAuth access token is kept only in the open Designer page's memory. It is not written to localStorage or IndexedDB; closing or refreshing the tab requires GitHub Device Flow sign-in again.
 - The Worker checks the signed-in GitHub login against `ALLOWED_GITHUB_LOGIN`.
 - A GitHub App installation token is minted server-side from the App private key stored as a Cloudflare Worker secret.
 - The App installation should have **Contents: Read and write** permission on this repository only.
 - Uploads are restricted to `projects/<slug>/flutter/**` on `main`. The worker validates paths and requires `pubspec.yaml` and `lib/main.dart`.
 - Request limit: 200 files / 50 MiB total. GitHub Actions then builds the APK from the committed source.
-- Logout clears the HttpOnly session cookie.
+- Disconnect clears the in-memory token.
 
 ## One-time setup required
 
@@ -38,7 +38,7 @@ This repository change prepares the Worker source. It does not deploy a Worker o
    ```sh
    wrangler deploy
    ```
-7. Set the Worker URL in the Builder's GitHub connection settings and use **Connect GitHub**. Complete the one-time GitHub Device Flow approval. The Worker stores the resulting session in an HttpOnly cookie for up to 8 hours.
+7. Set the Worker URL in the Builder's GitHub connection settings and use **Connect GitHub**. Complete the one-time GitHub Device Flow approval. The OAuth access token remains in page memory only; it is not persisted to browser storage.
 
 ## Endpoints
 
@@ -46,7 +46,7 @@ This repository change prepares the Worker source. It does not deploy a Worker o
 - `POST /auth/device-code`
 - `POST /auth/access-token` with `{ "device_code": "..." }`
 - `POST /auth/logout`
-- `POST /api/projects/:slug/upload` with `{ "files": [{ "path": "pubspec.yaml", "contentBase64": "..." }] }`
+- `POST /api/projects/:slug/upload` with an `Authorization: Bearer <GitHub OAuth token>` header and `{ "files": [{ "path": "pubspec.yaml", "contentBase64": "..." }] }`
 
 Successful upload returns the commit SHA, project directory, and GitHub Actions URL.
 
