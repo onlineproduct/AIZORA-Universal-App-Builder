@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'designer.html'
+      - 'workers/github-upload-bridge/**'
       - 'tests/flutter_codegen_smoke/**'
       - '.github/workflows/flutter-codegen-smoke.yml'
   pull_request:
@@ -39,6 +40,9 @@ jobs:
           Path("/tmp/aizora-designer.js").write_text(scripts[-1], encoding="utf-8")
           PY
           node --check /tmp/aizora-designer.js
+      - name: Validate GitHub upload Worker JavaScript syntax
+        working-directory: ${{ github.workspace }}
+        run: node --input-type=module --check < workers/github-upload-bridge/src/index.js
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
