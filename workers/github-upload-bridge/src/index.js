@@ -33,7 +33,7 @@ function base64Url(bytes) {
 
 function pemToBytes(pem) {
   const isPkcs1 = pem.includes("-----BEGIN RSA PRIVATE KEY-----");
-  const clean = pem.replace(/-----BEGIN (?:RSA )?PRIVATE KEY-----|-----END (?:RSA )?PRIVATE KEY-----|\\s/g, "");
+  const clean = pem.replace(/-----BEGIN (?:RSA )?PRIVATE KEY-----|-----END (?:RSA )?PRIVATE KEY-----|\s/g, "");
   const binary = atob(clean);
   const raw = Uint8Array.from(binary, (c) => c.charCodeAt(0));
   if (!isPkcs1) return raw;
