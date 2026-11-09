@@ -25,6 +25,7 @@ header{height:auto;min-height:58px;padding:10px 16px;display:flex;align-items:ce
  <button class="secondary" id="logoutGithub">Disconnect</button>
  <button id="uploadAndBuild">Upload Project & Build APK</button>
  <span id="githubBridgeStatus" class="muted" style="flex-basis:100%">একবার Cloudflare Worker সেটআপ করে URL দিন, তারপর GitHub Device Flow দিয়ে অনুমোদন করুন।</span>
+ <a id="githubVerifyLink" href="#" target="_blank" rel="noopener" hidden style="color:#9fc4ff">Open GitHub verification</a>
  <a id="githubActionsLink" href="#" target="_blank" rel="noopener" hidden style="color:#9fc4ff">Open GitHub Actions</a>
 </section>
 <div class="workspace">
@@ -163,7 +164,8 @@ $('connectGithub').onclick=async()=>{
   $('githubBridgeStatus').textContent='GitHub Device Flow শুরু হচ্ছে…';
   const {data}=await bridgeRequest('/auth/device-code',{method:'POST',body:'{}'});
   if(!data.device_code||!data.user_code||!data.verification_uri)throw Error('GitHub Device Flow-এর উত্তর অসম্পূর্ণ');
-  $('githubBridgeStatus').textContent='GitHub-এ এই কোডটি দিন: '+data.user_code+' — অনুমোদনের অপেক্ষা চলছে…';
+  $('githubBridgeStatus').textContent='GitHub verification page-এ এই কোডটি দিন: '+data.user_code+' — অনুমোদনের অপেক্ষা চলছে…';
+  $('githubVerifyLink').href=data.verification_uri;$('githubVerifyLink').hidden=false;
   if(verificationTab)verificationTab.location.href=data.verification_uri;else window.open(data.verification_uri,'_blank','noopener');
   let interval=Math.max(5,Number(data.interval)||5),connected=false;
   for(let attempt=0;attempt<120;attempt++){
@@ -179,11 +181,11 @@ $('connectGithub').onclick=async()=>{
    githubOAuthToken=result.data.access_token;githubLogin=result.data.login||'GitHub user';connected=true;break;
   }
   if(!connected)throw Error('GitHub অনুমোদনের সময় শেষ হয়েছে। আবার Connect GitHub চাপুন।');
-  $('githubBridgeStatus').textContent='GitHub সংযুক্ত ✓ '+githubLogin+' (এই Designer tab খোলা থাকা পর্যন্ত)';
+  $('githubBridgeStatus').textContent='GitHub সংযুক্ত ✓ '+githubLogin+' (এই Designer tab খোলা থাকা পর্যন্ত)';$('githubVerifyLink').hidden=true;
  }catch(e){if(verificationTab&&!verificationTab.closed)verificationTab.close();$('githubBridgeStatus').textContent='GitHub সংযোগ ব্যর্থ: '+e.message;alert(e.message)}
  finally{btn.disabled=false}
 };
-$('logoutGithub').onclick=()=>{githubOAuthToken='';githubLogin='';$('githubBridgeStatus').textContent='GitHub সংযোগ বিচ্ছিন্ন হয়েছে। আবার Connect GitHub চাপলে অনুমোদন করতে পারবেন।';$('githubActionsLink').hidden=true};
+$('logoutGithub').onclick=()=>{githubOAuthToken='';githubLogin='';$('githubBridgeStatus').textContent='GitHub সংযোগ বিচ্ছিন্ন হয়েছে। আবার Connect GitHub চাপলে অনুমোদন করতে পারবেন।';$('githubActionsLink').hidden=true;$('githubVerifyLink').hidden=true};
 function bytesToBase64(value){
  const bytes=value instanceof Uint8Array?value:new Uint8Array(value);
  let binary='';const chunk=0x8000;
