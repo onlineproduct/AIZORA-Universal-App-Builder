@@ -204,7 +204,9 @@ $('uploadAndBuild').onclick=async()=>{
   if(!githubOAuthToken)throw Error('আগে Connect GitHub চাপুন এবং GitHub অনুমোদন সম্পন্ন করুন');
   const p=selectedBuilderProject();if(!p)throw Error('আগে একটি My Projects প্রজেক্ট নির্বাচন করুন');
   await saveFlutterFiles(flutterMainDart(),flutterPubspec());
-  const slug=(p.name||'aizora-app').toLowerCase().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'')||'aizora-app';
+  const nameSlug=(p.name||'aizora-app').toLowerCase().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'aizora-app';
+  const idSuffix=String(p.id||'').replace(/[^a-z0-9]/gi,'').slice(0,8).toLowerCase()||'project';
+  const slug=(nameSlug+'-'+idSuffix).slice(0,50);
   const selected=(p.files||[]).filter(f=>typeof f.path==='string'&&f.path.startsWith('flutter/'));
   const files=[];
   for(const f of selected){
