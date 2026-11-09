@@ -143,7 +143,7 @@ async function loadDesignerZipLibrary(){
 
 const GITHUB_WORKER_KEY='aizora_github_upload_worker_url_v1';
 $('githubWorkerUrl').value=localStorage.getItem(GITHUB_WORKER_KEY)||'';
-function workerBase(){const value=$('githubWorkerUrl').value.trim().replace(/\\/+$/,'');if(!value)throw Error('আগে Cloudflare Worker URL দিন');const u=new URL(value);if(u.protocol!=='https:')throw Error('Worker URL অবশ্যই HTTPS হতে হবে');return value}
+function workerBase(){const value=$('githubWorkerUrl').value.trim().replace(/\/+$/,'');if(!value)throw Error('আগে Cloudflare Worker URL দিন');const u=new URL(value);if(u.protocol!=='https:')throw Error('Worker URL অবশ্যই HTTPS হতে হবে');return value}
 $('saveGithubWorker').onclick=()=>{try{const value=workerBase();localStorage.setItem(GITHUB_WORKER_KEY,value);$('githubBridgeStatus').textContent='Worker URL সংরক্ষিত ✓'}catch(e){$('githubBridgeStatus').textContent=e.message}};
 async function bridgeRequest(path,options={}){
  const base=workerBase();
