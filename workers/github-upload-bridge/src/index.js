@@ -2,6 +2,8 @@ const GITHUB_API = "https://api.github.com";
 const GITHUB_API_VERSION = "2022-11-28";
 const MAX_FILES = 200;
 const MAX_TOTAL_BYTES = 50 * 1024 * 1024;
+const TARGET_REPOSITORY = "onlineproduct/AIZORA-Universal-App-Builder";
+const TARGET_BRANCH = "main";
 
 function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -161,8 +163,8 @@ async function uploadProject(request, env, slug, userToken) {
     throw new Error("Project must include pubspec.yaml and lib/main.dart.");
   }
 
-  const repo = env.GITHUB_REPOSITORY || "onlineproduct/AIZORA-Universal-App-Builder";
-  const branch = env.GITHUB_BRANCH || "main";
+  const repo = TARGET_REPOSITORY;
+  const branch = TARGET_BRANCH;
   const root = "projects/" + slug + "/flutter/";
   const token = await installationToken(env);
   const ref = await githubApi("/repos/" + repo + "/git/ref/heads/" + encodeURIComponent(branch), token);
