@@ -50,6 +50,8 @@ jobs:
           APP_NAME="$(basename "$(dirname "$PROJECT_DIR")" | tr '-' '_' | tr -cd '[:alnum:]_')"
           [ -n "$APP_NAME" ] || APP_NAME="aizora_generated_app"
           flutter create --platforms=android --project-name "$APP_NAME" "$BUILD_DIR"
+          # Remove the template test that imports the scaffold package name; real project tests are copied back below.
+          rm -rf "$BUILD_DIR/test"
           cp -a "$PROJECT_DIR/." "$BUILD_DIR/"
           echo "BUILD_DIR=$BUILD_DIR" >> "$GITHUB_ENV"
 
