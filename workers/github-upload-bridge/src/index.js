@@ -120,6 +120,10 @@ function safeSlug(value) {
 }
 
 async function uploadProject(request, env, slug, userToken) {
+  const contentLength = Number(request.headers.get("Content-Length") || 0);
+  if (contentLength > Math.ceil(MAX_TOTAL_BYTES * 1.4) + 1024 * 1024) {
+    throw new Error("Upload request exceeds the 50 MiB project limit.");
+  }
   const user = await userForToken(userToken);
   if (!env.ALLOWED_GITHUB_LOGIN || user.login.toLowerCase() !== env.ALLOWED_GITHUB_LOGIN.toLowerCase()) {
     throw new Error("This GitHub account is not allowed to upload to the configured project repository.");
