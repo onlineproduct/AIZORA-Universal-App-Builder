@@ -1,0 +1,36 @@
+name: No-Code Builder syntax check
+
+on:
+  pull_request:
+    paths:
+      - 'no-code.html'
+      - '.github/workflows/no-code-builder-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-no-code-builder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Validate embedded JavaScript
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("no-code.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script>(.*?)</script>", html, re.S)
+          if not scripts:
+              raise SystemExit("No inline JavaScript found")
+          Path("/tmp/aizora-no-code.js").write_text(scripts[-1], encoding="utf-8")
+          PY
+          node --check /tmp/aizora-no-code.js
+      - name: Check required editor features
+        run: |
+          grep -q 'data-type="button"' no-code.html
+          grep -q 'function renderLogic' no-code.html
+          grep -q 'function htmlExport' no-code.html
+          grep -q 'Export JSON' no-code.html

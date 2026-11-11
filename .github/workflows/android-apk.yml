@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'index.html'
-      - 'designer.html'
+      - 'designer.html'\n      - 'no-code.html'
       - 'app/**'
       - 'build.gradle'
       - 'settings.gradle'
@@ -26,7 +26,7 @@ jobs:
         run: |
           mkdir -p app/src/main/assets
           cp index.html app/src/main/assets/index.html
-          cp designer.html app/src/main/assets/designer.html
+          cp designer.html app/src/main/assets/designer.html\n          cp no-code.html app/src/main/assets/no-code.html
 
       - name: Set up Java
         uses: actions/setup-java@v4
