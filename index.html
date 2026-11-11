@@ -11,12 +11,12 @@
 <section class="card" id="aiCard">
 <h2>🤖 AI Code Assistant</h2>
 <p class="muted">বাংলায় নির্দেশ লিখুন। AI কোড তৈরি, ব্যাখ্যা বা ভুল ঠিক করতে সাহায্য করবে। চালাতে Cloudflare Worker AI backend ও AI provider key সেটআপ করতে হবে।</p>
-<label for="aiEndpoint">AI Backend URL (Cloudflare Worker URL)</label><input id="aiEndpoint" type="url" placeholder="https://your-ai-worker.your-subdomain.workers.dev">
+<label for="aiEndpoint">AI Backend URL (Cloudflare Worker URL)</label><input id="aiEndpoint" type="url" placeholder="https://your-ai-worker.your-subdomain.workers.dev"><button id="testAIBackend" class="alt" type="button">🔎 Backend সংযোগ পরীক্ষা</button>
 <label for="aiTask">কী তৈরি বা ঠিক করতে চান?</label><textarea id="aiTask" style="height:120px" placeholder="উদাহরণ: HTML, CSS ও JavaScript দিয়ে একটি সুন্দর লগইন পেজ তৈরি করো।"></textarea>
 <div class="row"><label for="aiMode">কাজ</label><select id="aiMode"><option value="generate">নতুন কোড তৈরি</option><option value="explain">কোড ব্যাখ্যা</option><option value="fix">কোডের ভুল ঠিক</option></select><label for="aiLanguage">কোডের ধরন</label><select id="aiLanguage"><option value="html">HTML/CSS/JavaScript</option><option value="javascript">JavaScript</option><option value="python">Python</option><option value="java">Java (Android)</option><option value="kotlin">Kotlin (Android)</option><option value="json">JSON</option><option value="other">অন্যান্য</option></select></div>
 <label for="aiSource">বর্তমান কোড (ঐচ্ছিক; Fix/Explain-এর জন্য দিন)</label><textarea id="aiSource" style="height:150px" placeholder="এখানে বর্তমান কোড পেস্ট করুন..."></textarea>
 <div class="row"><button id="runAI">✨ AI দিয়ে কাজ করাও</button><button id="saveAI" class="alt" disabled>📄 প্রজেক্টে ফাইল হিসেবে রাখুন</button></div>
-<p id="aiStatus" class="muted status" aria-live="polite">Backend সেটআপ না করা পর্যন্ত AI অনুরোধ কাজ করবে না।</p>
+<p id="aiStatus" class="muted status" aria-live="polite">নির্ধারিত Worker URL বসানো হয়েছে; ব্যবহার করার আগে Backend সংযোগ পরীক্ষা করুন।</p>
 <label for="aiResult">AI ফলাফল</label><textarea id="aiResult" spellcheck="false" style="height:260px" placeholder="AI-এর ফলাফল এখানে দেখা যাবে..."></textarea>
 <p class="muted">নিরাপত্তা: AI provider API key এখানে বা APK-তে লিখবেন না। সেটি Cloudflare Worker-এর Secret হিসেবে রাখতে হবে।</p>
 </section>
@@ -95,8 +95,21 @@ $('buildApk').onclick=async()=>{const p=current();if(!p)return alert('আগে 
 $('exportZip').onclick=async()=>{const p=current();if(!p)return;const btn=$('exportZip');btn.disabled=true;btn.textContent='ZIP তৈরি হচ্ছে…';try{const JSZip=await loadJSZip(),z=new JSZip(),root=p.name.replace(/[\\/:*?"<>|\x00-\x1f]/g,'_')||'AIZORA-Project';z.file(root+'/',null,{dir:true});z.file(root+'/Source Code/',null,{dir:true});z.file(root+'/APK/',null,{dir:true});for(const f of p.folders){const fp=f==='APK'||f.startsWith('APK/')?f:'Source Code/'+f;z.file(root+'/'+fp+'/',null,{dir:true})}for(const f of p.files){const fp=f.path==='APK'||f.path.startsWith('APK/')?f.path:'Source Code/'+f.path;if(f.binary){if(!f.bytes)throw Error('Binary data missing: '+f.path);z.file(root+'/'+fp,f.bytes)}else z.file(root+'/'+fp,f.content||'')}const blob=await z.generateAsync({type:'blob',compression:'DEFLATE'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=root+'.zip';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}catch(e){alert('ZIP Export ব্যর্থ: '+e.message)}finally{btn.disabled=false;btn.textContent='📦 Export ZIP'}};
 
 const AI_ENDPOINT_KEY='aizora_ai_backend_url_v1';
-$('aiEndpoint').value=localStorage.getItem(AI_ENDPOINT_KEY)||'';
+const DEFAULT_AI_ENDPOINT='https://aizora-universal-builder-api.3djml961982.workers.dev';
+$('aiEndpoint').value=localStorage.getItem(AI_ENDPOINT_KEY)||DEFAULT_AI_ENDPOINT;
 $('aiEndpoint').addEventListener('change',()=>{const v=$('aiEndpoint').value.trim();localStorage.setItem(AI_ENDPOINT_KEY,v.endsWith('/')?v.slice(0,-1):v)});
+$('testAIBackend').onclick=async()=>{
+ const raw=$('aiEndpoint').value.trim(),endpoint=raw.endsWith('/')?raw.slice(0,-1):raw,btn=$('testAIBackend');
+ if(!endpoint.startsWith('https://'))return $('aiStatus').textContent='সঠিক HTTPS Backend URL দিন।';
+ btn.disabled=true;$('aiStatus').textContent='Backend health পরীক্ষা হচ্ছে…';
+ try{
+  const response=await fetch(endpoint+'/api/health',{method:'GET',headers:{'accept':'application/json'}});
+  const body=await response.json().catch(()=>({}));
+  if(!response.ok||body.ok!==true)throw Error(body.error||('Health check HTTP '+response.status));
+  $('aiStatus').textContent=body.configured===true?'Backend সংযুক্ত ✓ AI key ও model configured.':'Backend পাওয়া গেছে ✓ তবে AI_API_KEY বা AI_MODEL এখনো configure করা হয়নি।';
+ }catch(e){$('aiStatus').textContent='Backend পরীক্ষা ব্যর্থ: '+e.message+' — Worker URL, /api/health route এবং CORS পরীক্ষা করুন।'}
+ finally{btn.disabled=false}
+};
 $('runAI').onclick=async()=>{
  const rawEndpoint=$('aiEndpoint').value.trim(); const endpoint=rawEndpoint.endsWith('/')?rawEndpoint.slice(0,-1):rawEndpoint;
  const task=$('aiTask').value.trim(), mode=$('aiMode').value, language=$('aiLanguage').value, source=$('aiSource').value;
