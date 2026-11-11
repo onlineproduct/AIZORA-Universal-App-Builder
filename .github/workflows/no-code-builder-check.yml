@@ -22,7 +22,7 @@ jobs:
           from pathlib import Path
           import re
           html = Path("no-code.html").read_text(encoding="utf-8")
-          scripts = re.findall(r"<script>([\\s\\S]*?)</script>", html)
+          scripts = re.findall(r"<script>(.*?)</script>", html, re.S)
           if not scripts:
               raise SystemExit("No inline JavaScript found")
           Path("/tmp/aizora-no-code.js").write_text(scripts[-1], encoding="utf-8")
