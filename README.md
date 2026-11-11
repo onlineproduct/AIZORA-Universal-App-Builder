@@ -2,7 +2,7 @@
 
 AIZORA Universal App Builder — Build, edit, and manage Android apps with AI assistance, manual coding, visual design, and automated APK builds using GitHub Actions.
 
-## Visual Designer → APK
+## No-Code Builder (MVP)\n\nOpen `no-code.html` from the home screen. The first MVP includes drag-and-drop components, multiple screens, editable properties, basic button actions (alert/navigation/text update), local auto-save, JSON import/export, and standalone HTML export. It is an initial no-code foundation; full nested block programming and direct APK generation from this editor remain future work.\n\n## Visual Designer → APK
 
 1. Open **Visual Designer** and select a project from **My Projects**.
 2. Generate/save Flutter code, then use **Upload Project & Build APK**.
